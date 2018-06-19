@@ -1,0 +1,136 @@
+# Translation of Plugins - Logbook - Stable (latest release) in Japanese
+# This file is distributed under the same license as the Plugins - Logbook - Stable (latest release) package.
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2017-11-29 07:05:55+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: GlotPress/2.4.0-alpha\n"
+"Language: ja_JP\n"
+"Project-Id-Version: Plugins - Logbook - Stable (latest release)\n"
+
+#: src/LogBook/Admin.php:132
+msgid "All Users"
+msgstr "すべてのユーザー"
+
+#: src/LogBook/Rest_Logs_Controller.php:32
+msgid "Unique identifier for the log."
+msgstr "ログのユニークな識別子。"
+
+#. Author URI of the plugin/theme
+msgid "https://tarosky.co.jp/"
+msgstr "https://tarosky.co.jp/"
+
+#. Author of the plugin/theme
+msgid "Takayuki Miyauchi"
+msgstr "宮内 隆行"
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/tarosky/logbook"
+msgstr "https://github.com/tarosky/logbook"
+
+#. Plugin Name of the plugin/theme
+msgid "LogBook"
+msgstr "LogBook"
+
+#: src/LogBook/Post_Type.php:18
+msgid "Logs"
+msgstr "ログ"
+
+#: src/LogBook/Logger/WP_Login.php:24
+msgid "User \"%s\" logged in."
+msgstr "ユーザー \"%s\" がログインしました。"
+
+#: src/LogBook/Logger/Updated_Extensions.php:47
+msgid "Themes were updated."
+msgstr "テーマをアップデートしました。"
+
+#: src/LogBook/Logger/Updated_Extensions.php:42
+msgid "Plugins were updated."
+msgstr "プラグインをアップデートしました。"
+
+#: src/LogBook/Logger/Updated_Core.php:23
+msgid "WordPress was updated to %s."
+msgstr "WordPress %s へアップデートしました。"
+
+#: src/LogBook/Logger/Post_Updated.php:42
+msgid "#%s \"%s\" was updated."
+msgstr "#%s \"%s\" をアップデートしました。"
+
+#: src/LogBook/Logger/Post_Updated.php:40
+msgid "#%s \"%s\" was published."
+msgstr "#%s \"%s\" を公開しました。"
+
+#: src/LogBook/Logger/Post_Updated.php:38
+msgid "#%s \"%s\" was moved to trash."
+msgstr "#%s \"%s\" をゴミ箱へ移動しました。"
+
+#: src/LogBook/Logger/Delete_Post.php:33
+msgid "%s #%s \"%s\" was deleted."
+msgstr "%s #%s \"%s\" を削除しました。"
+
+#: src/LogBook/Logger/Activated_Extensions.php:50
+msgid "Plugin \"%s\" was deactivated."
+msgstr "プラグイン \"%s\" を停止しました。"
+
+#: src/LogBook/Logger/Activated_Extensions.php:45
+msgid "Plugin \"%s\" was activated."
+msgstr "プラグイン \"%s\" を有効化しました。"
+
+#: src/LogBook/Logger/Activated_Extensions.php:31
+msgid "Theme was switched to %s."
+msgstr "テーマを %s へ変更しました。"
+
+#: src/LogBook/Admin.php:167 src/LogBook/Admin.php:178
+msgid "User"
+msgstr "ユーザー"
+
+#: src/LogBook/Admin.php:166
+msgid "IP"
+msgstr "IP"
+
+#: src/LogBook/Admin.php:165 src/LogBook/Admin.php:177
+msgid "Level"
+msgstr "レベル"
+
+#: src/LogBook/Admin.php:164 src/LogBook/Admin.php:176
+msgid "Log"
+msgstr "ログ"
+
+#: src/LogBook/Admin.php:163 src/LogBook/Admin.php:175
+msgid "Date"
+msgstr "日付"
+
+#: src/LogBook/Admin.php:103
+msgid "All levels"
+msgstr "すべてのレベル"
+
+#: src/LogBook/Admin.php:82
+msgid "All labels"
+msgstr "すべてのラベル"
+
+#: src/LogBook/Admin/Settings.php:35
+msgid "Generate token"
+msgstr "トークンを生成"
+
+#: src/LogBook/Admin/Settings.php:27
+msgid "Regenerate token"
+msgstr "トークンを再生成"
+
+#. Description of the plugin/theme
+msgid "A logging plugin."
+msgstr "ログを取得するプラグイン。"
+
+#: src/LogBook/Logger/XML_RPC.php:23
+msgid "XML-RPC user was authenticated."
+msgstr "XML-RPC ユーザーを認証しました。"
+
+#: src/LogBook/Admin/Log_Page.php:45
+msgid "Back to the list page."
+msgstr "一覧ページへ戻る。"
+
+#: src/LogBook/Logger/Updated_Extensions.php:33
+msgid "Languages were updated."
+msgstr "翻訳をアップデートしました。"
