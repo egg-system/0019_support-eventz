@@ -112,13 +112,13 @@ if (is_tag() && //タグページの時
 <?php
 // 今日の日付
 $today = date("Y-m-d");
-$todayTime = $today . "00:00:00";
+$todayTime = $today . " 00:00:00";
 // 1ヶ月後の日付
 $nextMonth = date("Y-m-d",strtotime($today . "+1 month"));
-$nextMonthTime = $nextMonth . "23:59:59";
+$nextMonthTime = $nextMonth . " 23:59:59";
 // 2週間後
 $twoWeekLater = date("Y-m-d",strtotime($today . "+2 week"));
-$twoWeekLaterTime = $twoWeekLater . "23:59:59";
+$twoWeekLaterTime = $twoWeekLater . " 23:59:59";
 
 ////////////////////////////
 //一覧の繰り返し処理
