@@ -110,14 +110,44 @@ if (is_tag() && //タグページの時
 
 <div id="list">
 <?php
+// 今日の日付
+$today = date("Y-m-d");
+$todayTime = $today . " 00:00:00";
+// 1ヶ月後の日付
+$nextMonth = date("Y-m-d",strtotime($today . "+1 month"));
+$nextMonthTime = $nextMonth . " 23:59:59";
+// 2週間後
+$twoWeekLater = date("Y-m-d",strtotime($today . "+2 week"));
+$twoWeekLaterTime = $twoWeekLater . " 23:59:59";
+
 ////////////////////////////
 //一覧の繰り返し処理
 ////////////////////////////
+          
 // premiumタグのイベントを取得          
-query_posts('post_type=event&event-tag=premium');
+$arg = array('post_type' => 'event',
+        'event-tag' => 'premium',
+        'orderby' => 'meta_value',
+        'meta_key' => '_eventorganiser_schedule_start_start',
+        'order' => 'asc',
+        'meta_query' => array(
+            array(
+                'key'=> '_eventorganiser_schedule_start_start', // 絞り込みたいカスタムフィールドキー
+                'value'=> $todayTime, // 比較する値
+                'compare'=> '>=', // 比較演算
+            ),
+            array(
+                'key'=> '_eventorganiser_schedule_start_start', // 絞り込みたいカスタムフィールドキー
+                'value'=> $nextMonthTime, // 比較する値
+                'compare'=> '<=', // 比較演算
+            ),
+        ),
+        'posts_per_page' => 100
+    );
+$data = get_posts($arg);
 if (have_posts()) : // WordPress ループ
   $count = 0;
-  while (have_posts()) : the_post(); // 繰り返し処理開始
+  foreach ( $data as $post ) : setup_postdata( $post );
     $count += 1;
     global $g_list_index;
     $g_list_index = $count-1;//インデックスなので-1
@@ -164,7 +194,7 @@ if (have_posts()) : // WordPress ループ
 
     }
 
-  endwhile; // 繰り返し処理終了 ?>
+  endforeach;  // 繰り返し処理終了 ?>
   <div class="clear"></div>
 <?php else : // ここから記事が見つからなかった場合の処理  ?>
     <div class="post">
@@ -177,7 +207,8 @@ endif;
 </div><!-- /#list -->
 <?php 
 // premiumタグのイベント取得条件をリセット
-wp_reset_query();?>
+wp_reset_postdata();
+?>
 
 
 <br>
@@ -194,9 +225,30 @@ wp_reset_query();?>
 ////////////////////////////
 //一覧の繰り返し処理
 ////////////////////////////
+$arg = array('post_type' => 'event',
+        'event-tag' => 'cafekai',
+        'orderby' => 'meta_value',
+        'meta_key' => '_eventorganiser_schedule_start_start',
+        'order' => 'asc',
+        'meta_query' => array(
+            array(
+                'key'=> '_eventorganiser_schedule_start_start', // 絞り込みたいカスタムフィールドキー
+                'value'=> $todayTime, // 比較する値
+                'compare'=> '>=', // 比較演算
+            ),
+            array(
+                'key'=> '_eventorganiser_schedule_start_start', // 絞り込みたいカスタムフィールドキー
+                'value'=> $twoWeekLaterTime, // 比較する値
+                'compare'=> '<=', // 比較演算
+            ),
+        ),
+        'posts_per_page' => 50,
+        'paged' => $paged
+    );
+$data = get_posts($arg);
 if (have_posts()) : // WordPress ループ
   $count = 0;
-  while (have_posts()) : the_post(); // 繰り返し処理開始
+  foreach ( $data as $post ) : setup_postdata( $post );
     $count += 1;
     global $g_list_index;
     $g_list_index = $count-1;//インデックスなので-1
@@ -243,7 +295,7 @@ if (have_posts()) : // WordPress ループ
 
     }
 
-  endwhile; // 繰り返し処理終了 ?>
+  endforeach;  // 繰り返し処理終了 ?>
   <div class="clear"></div>
 <?php else : // ここから記事が見つからなかった場合の処理  ?>
     <div class="post">
@@ -254,6 +306,11 @@ if (have_posts()) : // WordPress ループ
 endif;
 ?>
 </div><!-- /#list -->
+
+<?php 
+// タグのイベント取得条件をリセット
+wp_reset_postdata();
+?>
 
 <?php
 ////////////////////////////
@@ -300,10 +357,29 @@ if ( is_list_pager_type_responsive() ) {
 //一覧の繰り返し処理　20180422
 ////////////////////////////
 // 外部セミナータグのイベントを取得          
-query_posts('post_type=event&event-tag=Externalseminar');
+$arg = array('post_type' => 'event',
+        'event-tag' => 'Externalseminar',
+        'orderby' => 'meta_value',
+        'meta_key' => '_eventorganiser_schedule_start_start',
+        'order' => 'asc',
+        'meta_query' => array(
+            array(
+                'key'=> '_eventorganiser_schedule_start_start', // 絞り込みたいカスタムフィールドキー
+                'value'=> $todayTime, // 比較する値
+                'compare'=> '>=', // 比較演算
+            ),
+            array(
+                'key'=> '_eventorganiser_schedule_start_start', // 絞り込みたいカスタムフィールドキー
+                'value'=> $twoWeekLaterTime, // 比較する値
+                'compare'=> '<=', // 比較演算
+            ),
+        ),
+        'posts_per_page' => 50
+    );
+$data = get_posts($arg);
 if (have_posts()) : // WordPress ループ
   $count = 0;
-  while (have_posts()) : the_post(); // 繰り返し処理開始
+  foreach ( $data as $post ) : setup_postdata( $post );
     $count += 1;
     global $g_list_index;
     $g_list_index = $count-1;//インデックスなので-1
@@ -350,7 +426,7 @@ if (have_posts()) : // WordPress ループ
 
     }
 
-  endwhile; // 繰り返し処理終了 ?>
+  endforeach;  // 繰り返し処理終了 ?>
   <div class="clear"></div>
 <?php else : // ここから記事が見つからなかった場合の処理  ?>
     <div class="post">
@@ -363,4 +439,5 @@ endif;
 </div><!-- /#list -->
 <?php 
 // 外部セミナータグのイベント取得条件をリセット
-wp_reset_query();?>
+wp_reset_postdata();
+?>
