@@ -330,11 +330,11 @@ if ( is_active_sidebar( 'widget-index-bottom' ) ):
   echo '</div>';
 endif; ?>
 
-<a href="https://support.eventz.jp/events/tag/cafekai?order=desc&meta_key=_eventorganiser_schedule_start_start&orderby=meta_value">
-<ul class="pagination">
+<div class="terms0408" style="text-align:center; padding: 30px 0 30px 0;">
+<a style="font-size: 20px !important; background: #517fa4; padding: 0.1em 3.0em;" href="https://support.eventz.jp/events/tag/cafekai?order=desc&meta_key=_eventorganiser_schedule_start_start&orderby=meta_value">
 もっと見る
-</ul>
 </a>
+</div>
 
 <div id="Externalseminar">
 <h2><img src="http://support.eventz.jp/wp-content/uploads/2017/05/icon_hoshi02-1.svg">外部セミナー</img></h2>
