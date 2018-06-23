@@ -242,7 +242,7 @@ $arg = array('post_type' => 'event',
                 'compare'=> '<=', // 比較演算
             ),
         ),
-        'posts_per_page' => 50,
+        'posts_per_page' => 30,
         'paged' => $paged
     );
 $data = get_posts($arg);
@@ -330,20 +330,11 @@ if ( is_active_sidebar( 'widget-index-bottom' ) ):
   echo '</div>';
 endif; ?>
 
-<?php
-////////////////////////////
-//エントリーのページャー
-////////////////////////////
-if ( is_list_pager_type_responsive() ) {
-  //レスポンシブタイプのページャー関数の呼び出し
-  responsive_pagination();
-} else {
-  //旧タイプのページャー
-  get_template_part('pager-paginate-links');
-}
-?>
-
-
+<a href="https://support.eventz.jp/events/tag/cafekai?order=desc&meta_key=_eventorganiser_schedule_start_start&orderby=meta_value">
+<ul class="pagination">
+もっと見る
+</ul>
+</a>
 
 <div id="Externalseminar">
 <h2><img src="http://support.eventz.jp/wp-content/uploads/2017/05/icon_hoshi02-1.svg">外部セミナー</img></h2>

@@ -1308,3 +1308,10 @@ function remove_admin_bar_menu( $wp_admin_bar ) {
    
  }
 add_action( 'admin_bar_menu', 'remove_admin_bar_menu', 70 );
+
+function add_meta_query_vars( $public_query_vars ) {
+    $public_query_vars[] = 'meta_key'; //カスタムフィールドのキー
+    $public_query_vars[] = 'meta_value'; //カスタムフィールドの値（文字列）
+    return $public_query_vars;
+}
+add_filter( 'query_vars', 'add_meta_query_vars' );
