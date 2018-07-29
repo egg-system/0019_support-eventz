@@ -46,6 +46,16 @@
         <?php the_content(); //本文の呼び出し?>
         </div>
 
+        <?php
+            // 報酬詳細画面に使う情報
+            $rewardDetailPage = 15411;
+            $rewardDetailFile = __DIR__ . '/rewardDetail.php';
+            if ($post->ID === $rewardDetailPage && file_exists($rewardDetailFile)) {
+                // 報酬詳細画面だけの処理を読み込み
+                include_once($rewardDetailFile);
+            }
+        ?>
+
         <footer>
           <?php get_template_part('pager-page-links');//ページリンクのページャー?>
 
