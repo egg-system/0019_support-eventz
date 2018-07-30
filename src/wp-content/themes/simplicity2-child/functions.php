@@ -16,7 +16,7 @@ add_editor_style();
 // 定数定義
 const UNPAID_MEMBER_LEVEL = 2;
 const PAID_MEMBER_LEVEL = 3;
-const TEST_CLIENT_IP = '00370';
+const TEST_CLIENT_IP = '00286';
 const PRODUCT_CLIENT_IP = '95518';
 const TELECOM_IP_FROM_TO = array('52.196.8.0', '54.65.177.67', '54.95.89.20', '54.238.8.174');
 
