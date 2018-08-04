@@ -40,13 +40,13 @@ function after_registration($data){
   if (in_array($member_level, MEMBER_LEVEL_ARR)) {
   	$email = $data['email'];
   	$tel = $data['phone'];
-    $money = _checkMemberFee($member_level;
+    $money = _checkMemberFee($member_level);
   	$redirectUrl = site_url()."/register_complete";
     // $client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
     $client_ip = (site_url() == 'http://sample004.eggsystem.co.jp/') ? TEST_CLIENT_IP : PRODUCT_CLIENT_IP; // テスト用
   	// $paymentUrl = "https://secure.telecomcredit.co.jp/inetcredit/adult/order.pl?clientip=".$client_ip."&money={$money}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
     $testPaymentUrl = "https://secure.telecomcredit.co.jp/inetcredit/adult/order.pl?clientip=".$client_ip."&money={$money}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
-  	header("Location: {$paymentUrl}");
+  	header("Location: {$testPaymentUrl}");
     exit;
   }
 }
@@ -104,6 +104,7 @@ function _checkMemberFee($member_level) {
   if ($member_level == UNPAID_PREMIUM_MEMBER) return PREMIUM_MEMBER_FEE;
   if ($member_level == UNPAID_PREMIUM_AGENCY) return PREMIUM_AGENCY_FEE;
   if ($member_level == UNPAID_PREMIUM_AGENCY_ORGANIZER) return PREMIUM_AGENCY_ORGANIZER_FEE;
+  return PREMIUM_MEMBER_FEE; // デフォルトを5000とする(仮)
 }
 
 ?>
