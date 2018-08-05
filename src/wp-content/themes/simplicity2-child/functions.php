@@ -37,7 +37,6 @@ const TELECOM_IP_FROM_TO = array('52.196.8.0', '54.65.177.67', '54.95.89.20', '5
 add_action('swpm_front_end_registration_complete_fb','after_registration');
 function after_registration($data){
   $member_level = $data['membership_level'];
-  var_dump($member_level);
   if (in_array($member_level, MEMBER_LEVEL_ARR)) {
   	$email = $data['email'];
   	$tel = $data['phone'];
@@ -60,7 +59,6 @@ function receive_telecom_result() {
   $is_telecom_access = _isTelecomIpAccessed();
   if ($is_telecom_access && isset($_GET['email']) && isset($_GET['tel']) && $_GET['rel'] == 'yes') {
     $email = $_GET['email'];
-    var_dump($email);
     $member_table = $wpdb->prefix . 'swpm_members_tbl';
     $wpdb->update($member_table, array('membership_level' => PAID_MEMBER_LEVEL), array('email' => $_GET['email']));
     // 件名
