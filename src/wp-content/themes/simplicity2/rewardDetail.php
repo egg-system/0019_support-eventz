@@ -45,28 +45,14 @@ $results = $wpdb->get_results($sql, ARRAY_A);
 // 取得したデータを成形する
 $introducerData = [];
 if (!empty($results)) {
-    $i = 1;
-    $cnt = count($results);
     foreach ($results as $record) {
         // 紹介者IDと月ごとでまとめる
         $introducerData[$record['member_id']][$record['date']] = $record;
-        // 月ごとの紹介者データを1つにまとめる
-        $introducerData[$record['member_id']][0] = $record;
-        /*
-        // 登録日は一番最初のものにする
-        if ($i === 1) {
-            $introducerData[$record['member_id']][0]['date'] = $record['date'];
-        } 
-        // それ以外は一番最後のデータを使う
-error_log($i."\n", 3, "/tmp/error.log");
-error_log($i."\n", 3, "/tmp/error.log");
-        if ($i === $cnt) {
-            $introducerData[$record['member_id']][0]['id'] = $record['id'];
-            $introducerData[$record['member_id']][0]['first_name'] = $record['first_name'];
-            $introducerData[$record['member_id']][0]['alias'] = $record['alias'];
-        } 
-        $i++;
-         */
+
+        // 1番最初のデータが1番はじめに登録されたデータなのでそれを代表のデータとしてまとめる
+        if (!isset($introducerData[$record['member_id']][0])) {
+            $introducerData[$record['member_id']][0] = $record;
+        }
     }
 }
 error_log(print_r($introducerData,true)."\n", 3, "/tmp/error.log");
@@ -80,7 +66,8 @@ error_log(print_r($introducerData,true)."\n", 3, "/tmp/error.log");
 document.getElementById('main').style.width = '100%';
 </script>
 <?php if (!empty($results)) { ?>
-    <table class="table">
+<div class="table-responsive">
+    <table class="table table-condensed">
         <thead>
             <tr>
                 <th>No</th>
@@ -94,20 +81,53 @@ document.getElementById('main').style.width = '100%';
             </tr>
         </thead>
         <tbody>
-        <?php foreach ($introducerData as $id => $data) { ?>
+        <?php $number = 1; ?>
+            <?php foreach ($introducerData as $id => $data) { ?>
                 <tr>
-                    <th><?php echo $data[0]['id']; ?></th>
+                    <td><?php echo $number; ?></td>
                     <td><?php echo $data[0]['first_name']; ?></td>
                     <td><?php echo $data[0]['date']; ?></td>
                     <td></td>
                     <td><?php echo $data[0]['alias']; ?></td>
                     <?php foreach ($allMonth as $month) { ?>
-                        <td><?php echo isset($data[$month]['price']) ? $data[$month]['price'] : '-'; ?></td>
+                        <td><?php echo isset($data[$month]['price']) ? '¥' . $data[$month]['price'] : '¥0'; ?></td>
                     <?php } ?>
                 </tr>
-        <?php } ?>
+                <?php $number++ ; ?>
+            <?php } ?>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>月間報酬額</td>
+                <?php foreach ($allMonth as $month) { ?>
+                    <?php $sum = 0 ; ?>
+                    <?php foreach ($introducerData as $id => $data) {
+                        $price = isset($data[$month]['price']) ? $data[$month]['price'] : 0;
+                        $sum += $price;
+                    } ?>
+                    <td><?php echo '¥' . $sum; ?></td>
+                <?php } ?>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>累計報酬額</td>
+                <?php $sum = 0 ; ?>
+                <?php foreach ($allMonth as $month) { ?>
+                    <?php foreach ($introducerData as $id => $data) {
+                        $price = isset($data[$month]['price']) ? $data[$month]['price'] : 0;
+                        $sum += $price;
+                    } ?>
+                    <td><?php echo '¥' . $sum; ?></td>
+                <?php } ?>
+            </tr>
         </tbody>
     </table>
+</div>
 <?php } else { ?>
     <div>報酬はありません</div>
 <?php } ?>
