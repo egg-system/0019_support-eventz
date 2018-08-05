@@ -40,7 +40,6 @@ ORDER BY rd.date
 SQL;
 $sql = $wpdb->prepare($bindSql, $id);
 $results = $wpdb->get_results($sql, ARRAY_A);
-//error_log(print_r($results,true)."\n", 3, "/tmp/error.log");
 
 // 取得したデータを成形する
 $introducerData = [];
@@ -96,6 +95,16 @@ document.getElementById('main').style.width = '100%';
                 <?php $number++ ; ?>
             <?php } ?>
             <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <?php foreach ($allMonth as $month) { ?>
+                    <th></th>
+                <?php } ?>
+            </tr>
+            <tr>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -123,6 +132,21 @@ document.getElementById('main').style.width = '100%';
                         $sum += $price;
                     } ?>
                     <td><?php echo '¥' . $sum; ?></td>
+                <?php } ?>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>出金申請額</td>
+                <?php foreach ($allMonth as $month) { ?>
+                    <?php $sum = 0 ; ?>
+                    <?php foreach ($introducerData as $id => $data) {
+                        $price = isset($data[$month]['price']) ? $data[$month]['price'] : 0;
+                        $sum += $price;
+                    } ?>
+                    <td><?php echo '¥0'; ?></td>
                 <?php } ?>
             </tr>
         </tbody>
