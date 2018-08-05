@@ -12,7 +12,6 @@ add_editor_style();
 //以下にSimplicity子テーマ用の関数を書く
 // --------↑デフォルト記載箇所残してます↑--------
 
-
 // 定数定義
 const UNPAID_PREMIUM_MEMBER = 5; // プレミアム会員（決済未済）
 const UNPAID_PREMIUM_AGENCY = 6; // プレミアム代理店会員（決済未済）
@@ -37,11 +36,8 @@ const TELECOM_IP_FROM_TO = array('52.196.8.0', '54.65.177.67', '54.95.89.20', '5
 add_action('swpm_front_end_registration_complete_fb','after_registration');
 function after_registration($data){
   $member_level = $data['membership_level'];
-  // ログ
-  error_log(print_r($member_level,　true)."\n", 3, "/tmp/error.log");
   if (in_array($member_level, MEMBER_LEVEL_ARR)) {
   	$email = $data['email'];
-    error_log(print_r($email,　true)."\n", 3, "/tmp/error.log");
   	$tel = $data['phone'];
     $money = _checkMemberFee($member_level);
   	$redirectUrl = site_url()."/register_complete";
@@ -60,9 +56,6 @@ function receive_telecom_result() {
   global $wpdb;
   //IPアドレスでテレコムからのアクセスであることを確認
   $is_telecom_access = _isTelecomIpAccessed();
-  // ログ
-  error_log(print_r($is_telecom_access,　true)."\n", 3, "/tmp/error.log");
-  var_dump($is_telecom_access);
   if ($is_telecom_access && isset($_GET['email']) && isset($_GET['tel']) && $_GET['rel'] == 'yes') {
     $email = $_GET['email'];
     $member_table = $wpdb->prefix . 'swpm_members_tbl';
