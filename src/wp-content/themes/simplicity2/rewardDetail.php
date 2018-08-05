@@ -42,19 +42,31 @@ $sql = $wpdb->prepare($bindSql, $id);
 $results = $wpdb->get_results($sql, ARRAY_A);
 
 // 取得したデータを成形する
-$introducerData = [];
+$inputData = [];
+$outputData = [];
 if (!empty($results)) {
     foreach ($results as $record) {
-        // 紹介者IDと月ごとでまとめる
-        $introducerData[$record['member_id']][$record['date']] = $record;
+        // 入金データ
+        if ($record['price'] > 0) {
+            // 紹介者IDと月ごとでまとめる
+            $inputData[$record['member_id']][$record['date']] = $record;
 
-        // 1番最初のデータが1番はじめに登録されたデータなのでそれを代表のデータとしてまとめる
-        if (!isset($introducerData[$record['member_id']][0])) {
-            $introducerData[$record['member_id']][0] = $record;
+            // 1番最初のデータが1番はじめに登録されたデータなのでそれを代表のデータとしてまとめる
+            if (!isset($inputData[$record['member_id']][0])) {
+                $inputData[$record['member_id']][0] = $record;
+            }
+        // 出金データ
+        } else {
+            // 月ごとでまとめる
+            if (!isset($outputData[$record['date']])) {
+                $outputData[$record['date']] = $record['price'];
+            } else {
+                $outputData[$record['date']] += $record['price'];
+            }
         }
     }
 }
-error_log(print_r($introducerData,true)."\n", 3, "/tmp/error.log");
+error_log(print_r($outputData,true)."\n", 3, "/tmp/error.log");
 ?>
 
 <!--TODO:bootstrapの読み込み方とタイミングを変える-->
@@ -81,7 +93,7 @@ document.getElementById('main').style.width = '100%';
         </thead>
         <tbody>
         <?php $number = 1; ?>
-            <?php foreach ($introducerData as $id => $data) { ?>
+            <?php foreach ($inputData as $id => $data) { ?>
                 <tr>
                     <td><?php echo $number; ?></td>
                     <td><?php echo $data[0]['first_name']; ?></td>
@@ -89,7 +101,7 @@ document.getElementById('main').style.width = '100%';
                     <td></td>
                     <td><?php echo $data[0]['alias']; ?></td>
                     <?php foreach ($allMonth as $month) { ?>
-                        <td><?php echo isset($data[$month]['price']) ? '¥' . $data[$month]['price'] : '¥0'; ?></td>
+                        <td><?php echo isset($data[$month]['price']) ? '¥' . number_format($data[$month]['price']) : '¥0'; ?></td>
                     <?php } ?>
                 </tr>
                 <?php $number++ ; ?>
@@ -112,11 +124,22 @@ document.getElementById('main').style.width = '100%';
                 <td>月間報酬額</td>
                 <?php foreach ($allMonth as $month) { ?>
                     <?php $sum = 0 ; ?>
-                    <?php foreach ($introducerData as $id => $data) {
+                    <?php foreach ($inputData as $id => $data) {
                         $price = isset($data[$month]['price']) ? $data[$month]['price'] : 0;
                         $sum += $price;
                     } ?>
-                    <td><?php echo '¥' . $sum; ?></td>
+                    <td><?php echo '¥' . number_format($sum); ?></td>
+                <?php } ?>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>出金申請額</td>
+                <?php foreach ($allMonth as $month) { ?>
+                    <?php $price = isset($outputData[$month]) ? abs($outputData[$month]) : 0; ?>
+                    <td><?php echo '¥' . number_format($price); ?></td>
                 <?php } ?>
             </tr>
             <tr>
@@ -127,26 +150,16 @@ document.getElementById('main').style.width = '100%';
                 <td>累計報酬額</td>
                 <?php $sum = 0 ; ?>
                 <?php foreach ($allMonth as $month) { ?>
-                    <?php foreach ($introducerData as $id => $data) {
+                <?php 
+                    foreach ($inputData as $id => $data) {
                         $price = isset($data[$month]['price']) ? $data[$month]['price'] : 0;
                         $sum += $price;
-                    } ?>
-                    <td><?php echo '¥' . $sum; ?></td>
-                <?php } ?>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>出金申請額</td>
-                <?php foreach ($allMonth as $month) { ?>
-                    <?php $sum = 0 ; ?>
-                    <?php foreach ($introducerData as $id => $data) {
-                        $price = isset($data[$month]['price']) ? $data[$month]['price'] : 0;
-                        $sum += $price;
-                    } ?>
-                    <td><?php echo '¥0'; ?></td>
+                    }
+
+                    $output = isset($outputData[$month]) ? abs($outputData[$month]) : 0;
+                    $sum -= $output;
+                ?>
+                    <td><?php echo '¥' . number_format($sum); ?></td>
                 <?php } ?>
             </tr>
         </tbody>
