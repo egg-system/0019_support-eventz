@@ -18,6 +18,8 @@ $allMonth = [];
 for ($i = 0; $i < $term; $i++) {
     $allMonth[] = date("Ym",strtotime("-${i} month"));
 }
+// 月を昇順でソート
+asort($allMonth);
 
 $bindSql = <<<SQL
 SELECT rd.id,
@@ -34,17 +36,37 @@ LEFT JOIN ${memberShipTable} ms
 WHERE rd.member_id = %d
 AND DATE_FORMAT(rd.date, '%Y%m') >= ${minMonth}
 AND DATE_FORMAT(rd.date, '%Y%m') <= ${maxMonth}
+ORDER BY rd.date
 SQL;
 $sql = $wpdb->prepare($bindSql, $id);
 $results = $wpdb->get_results($sql, ARRAY_A);
-error_log(print_r($results,true)."\n", 3, "/tmp/error.log");
+//error_log(print_r($results,true)."\n", 3, "/tmp/error.log");
 
 // 取得したデータを成形する
 $introducerData = [];
 if (!empty($results)) {
+    $i = 1;
+    $cnt = count($results);
     foreach ($results as $record) {
         // 紹介者IDと月ごとでまとめる
         $introducerData[$record['member_id']][$record['date']] = $record;
+        // 月ごとの紹介者データを1つにまとめる
+        $introducerData[$record['member_id']][0] = $record;
+        /*
+        // 登録日は一番最初のものにする
+        if ($i === 1) {
+            $introducerData[$record['member_id']][0]['date'] = $record['date'];
+        } 
+        // それ以外は一番最後のデータを使う
+error_log($i."\n", 3, "/tmp/error.log");
+error_log($i."\n", 3, "/tmp/error.log");
+        if ($i === $cnt) {
+            $introducerData[$record['member_id']][0]['id'] = $record['id'];
+            $introducerData[$record['member_id']][0]['first_name'] = $record['first_name'];
+            $introducerData[$record['member_id']][0]['alias'] = $record['alias'];
+        } 
+        $i++;
+         */
     }
 }
 error_log(print_r($introducerData,true)."\n", 3, "/tmp/error.log");
@@ -61,33 +83,27 @@ document.getElementById('main').style.width = '100%';
     <table class="table">
         <thead>
             <tr>
-                <th>id</th>
+                <th>No</th>
                 <th>紹介者名</th>
-                <th>日付</th>
+                <th>登録日</th>
+                <th>区分変更</th>
                 <th>会員レベル</th>
-                <th>金額</th>
                 <?php foreach ($allMonth as $month) { ?>
                     <th><?php echo $month; ?></th>
                 <?php } ?>
             </tr>
         </thead>
         <tbody>
-        <?php foreach ($results as $result) { ?>
-                <tr>
-                    <th><?php echo $result['id']; ?></th>
-                    <td><?php echo $result['first_name']; ?></td>
-                    <td><?php echo $result['date']; ?></td>
-                    <td><?php echo $result['alias']; ?></td>
-                    <td><?php echo $result['price']; ?></td>
-                </tr>
-        <?php } ?>
         <?php foreach ($introducerData as $id => $data) { ?>
                 <tr>
-                    <th><?php echo $result['id']; ?></th>
-                    <td><?php echo $result['first_name']; ?></td>
-                    <td><?php echo $result['date']; ?></td>
-                    <td><?php echo $result['alias']; ?></td>
-                    <td><?php echo $result['price']; ?></td>
+                    <th><?php echo $data[0]['id']; ?></th>
+                    <td><?php echo $data[0]['first_name']; ?></td>
+                    <td><?php echo $data[0]['date']; ?></td>
+                    <td></td>
+                    <td><?php echo $data[0]['alias']; ?></td>
+                    <?php foreach ($allMonth as $month) { ?>
+                        <td><?php echo isset($data[$month]['price']) ? $data[$month]['price'] : '-'; ?></td>
+                    <?php } ?>
                 </tr>
         <?php } ?>
         </tbody>
