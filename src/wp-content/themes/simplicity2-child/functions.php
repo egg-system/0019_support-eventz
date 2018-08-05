@@ -37,6 +37,8 @@ const TELECOM_IP_FROM_TO = array('52.196.8.0', '54.65.177.67', '54.95.89.20', '5
 add_action('swpm_front_end_registration_complete_fb','after_registration');
 function after_registration($data){
   $member_level = $data['membership_level'];
+  // ログ
+  var_dump($is_telecom_access);
   if (in_array($member_level, MEMBER_LEVEL_ARR)) {
   	$email = $data['email'];
   	$tel = $data['phone'];
