@@ -38,7 +38,7 @@ add_action('swpm_front_end_registration_complete_fb','after_registration');
 function after_registration($data){
   $member_level = $data['membership_level'];
   // ログ
-  var_dump($is_telecom_access);
+  var_dump($member_level);
   if (in_array($member_level, MEMBER_LEVEL_ARR)) {
   	$email = $data['email'];
   	$tel = $data['phone'];
@@ -59,6 +59,8 @@ function receive_telecom_result() {
   global $wpdb;
   //IPアドレスでテレコムからのアクセスであることを確認
   $is_telecom_access = _isTelecomIpAccessed();
+  // ログ
+  var_dump($is_telecom_access);
   if ($is_telecom_access && isset($_GET['email']) && isset($_GET['tel']) && $_GET['rel'] == 'yes') {
     $email = $_GET['email'];
     $member_table = $wpdb->prefix . 'swpm_members_tbl';
