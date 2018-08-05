@@ -38,9 +38,10 @@ add_action('swpm_front_end_registration_complete_fb','after_registration');
 function after_registration($data){
   $member_level = $data['membership_level'];
   // ログ
-  var_dump($member_level);
+  error_log(print_r($member_level,　true)."\n", 3, "/tmp/error.log");
   if (in_array($member_level, MEMBER_LEVEL_ARR)) {
   	$email = $data['email'];
+    error_log(print_r($email,　true)."\n", 3, "/tmp/error.log");
   	$tel = $data['phone'];
     $money = _checkMemberFee($member_level);
   	$redirectUrl = site_url()."/register_complete";
