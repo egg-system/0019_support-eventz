@@ -60,6 +60,7 @@ function receive_telecom_result() {
   //IPアドレスでテレコムからのアクセスであることを確認
   $is_telecom_access = _isTelecomIpAccessed();
   // ログ
+  error_log(print_r($is_telecom_access,　true)."\n", 3, "/tmp/error.log");
   var_dump($is_telecom_access);
   if ($is_telecom_access && isset($_GET['email']) && isset($_GET['tel']) && $_GET['rel'] == 'yes') {
     $email = $_GET['email'];
