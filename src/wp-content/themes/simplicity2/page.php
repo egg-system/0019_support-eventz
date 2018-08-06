@@ -49,7 +49,7 @@
         <?php
             // 報酬詳細画面に使う情報
             $rewardDetailPage = 15411;
-            $rewardDetailFile = __DIR__ . '/rewardDetail.php';
+            $rewardDetailFile = __DIR__ . '/reward/rewardDetail.php';
             if ($post->ID === $rewardDetailPage && file_exists($rewardDetailFile) && SwpmMemberUtils::is_member_logged_in()) {
                 // 報酬詳細画面だけの処理を読み込み
                 include_once($rewardDetailFile);
