@@ -156,6 +156,7 @@ document.getElementById('main').style.width = '100%';
                         $sum += $price;
                     }
 
+                    // 出金分をマイナスする
                     $output = isset($outputData[$month]) ? abs($outputData[$month]) : 0;
                     $sum -= $output;
                 ?>
