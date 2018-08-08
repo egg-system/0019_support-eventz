@@ -15,6 +15,7 @@ class RewardDetail
     public $results;
     public $allMonth;
     public $inputData;
+    public $outputData;
     public $error;
 
     /**
@@ -35,10 +36,10 @@ class RewardDetail
      *
      * @return void
      */
-    public function setTemplateData()
+    public function exec()
     {
-        $this->setParam();
         $this->allMonth = $this->getMonth();
+        $this->setParam();
         //error_log($this->start."\n", 3, "/tmp/hikaru_error.log");
         //error_log($this->end."\n", 3, "/tmp/hikaru_error.log");
         $this->results = $this->getRewardData($this->start, $this->end);
@@ -46,6 +47,7 @@ class RewardDetail
         error_log(print_r($this->results,true)."\n", 3, "/tmp/hikaru_error.log");
         error_log(print_r($this->inputData,true)."\n", 3, "/tmp/hikaru_error.log");
         error_log(print_r($this->outputData,true)."\n", 3, "/tmp/hikaru_error.log");
+
     }
 
     /**

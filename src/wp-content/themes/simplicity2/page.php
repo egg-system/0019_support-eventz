@@ -51,12 +51,16 @@
             $rewardDetailPage = 15411;
             $rewardDetailFile = __DIR__ . '/reward/rewardDetail.php';
             $rewardDetailTemplateFile = __DIR__ . '/reward/rewardDetailTemplate.php';
-            if ($post->ID === $rewardDetailPage && file_exists($rewardDetailFile) && SwpmMemberUtils::is_member_logged_in()) {
+            if ($post->ID === $rewardDetailPage && 
+                file_exists($rewardDetailFile) && 
+                file_exists($rewardDetailTemplateFile) && 
+                SwpmMemberUtils::is_member_logged_in()) {
+
                 // 報酬詳細画面だけの処理を読み込み
                 include_once($rewardDetailFile);
                 // ロジック
                 $rewardDetail = new RewardDetail($wpdb, $table_prefix);
-                $rewardDetail->setTemplateData();
+                $rewardDetail->exec();
                 // テンプレートの読み込み
                 include_once($rewardDetailTemplateFile);
             }
