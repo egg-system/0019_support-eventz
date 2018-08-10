@@ -6,7 +6,7 @@
 document.getElementById('main').style.width = '100%';
 </script>
 
-<form class="form-inline" action="reward_detail_test" method="get">
+<form class="form-inline" action="<?php echo $rewardDetail::PAGE_URL; ?>" method="get">
   <div class="form-group">
     <label>開始</label>
     <input type="number" class="form-control" placeholder="201801" name="start" value="<?php echo $rewardDetail->start; ?>">
@@ -115,3 +115,10 @@ document.getElementById('main').style.width = '100%';
     <div>報酬はありません</div>
 <?php } ?>
 
+<form class="form-inline" action="<?php echo $rewardDetail::PAGE_URL; ?>" method="get">
+  <div class="form-group">
+    <label>出金申請金額：</label>
+    <input type="number" class="form-control" placeholder="¥30,000" name="price" value="">
+  </div>
+  <button type="submit" class="btn btn-success">申請</button>
+</form>

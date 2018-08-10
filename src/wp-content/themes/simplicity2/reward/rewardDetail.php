@@ -4,10 +4,16 @@ class RewardDetail
 {
     // 最大期間
     const MAX_TERM = 6;
+    // ページのURL
+    const PAGE_URL = "reward_detail_test";
+    // テーブル名
+    const REWARD_TABLE = "reward_details";
 
     // ワードプレスのグローバル変数
     private $wpdb;
     private $tablePrefix;
+    // メンバーID
+    private $membersId = null;
 
     // テンプレートで使う変数
     public $start = "";
@@ -16,6 +22,7 @@ class RewardDetail
     public $allMonth = [];
     public $inputData = [];
     public $outputData = [];
+    public $totalPrice = 0;
     public $error = "";
 
     /**
@@ -41,6 +48,8 @@ class RewardDetail
         $this->setParam();
         $this->results = $this->getRewardData($this->start, $this->end);
         $this->setInputOutput($this->results);
+        $this->totalPrice = $this->getTotalRewardPrice();
+        error_log(print_r($this->totalPrice,true)."\n", 3, "/tmp/hikaru_error.log");
     }
 
     /**
@@ -72,11 +81,6 @@ class RewardDetail
      */
     private function checkParam($start, $end)
     {
-        error_log($start."\n", 3, "/tmp/hikaru_error.log");
-        error_log(gettype($start)."\n", 3, "/tmp/hikaru_error.log");
-        error_log($end."\n", 3, "/tmp/hikaru_error.log");
-        error_log(gettype($end)."\n", 3, "/tmp/hikaru_error.log");
-
         // 未設定の場合はエラーメッセージは出さない
         if ($start === null && $end === null) {
             return false;
@@ -177,12 +181,12 @@ class RewardDetail
     private function getRewardData($start, $end)
     {
         // 必要なテーブルの定義
-        $rewardDetailsTable = $this->tablePrefix . "reward_details";
+        $rewardDetailsTable = $this->tablePrefix . self::REWARD_TABLE;
         $membersTable = $this->tablePrefix . "swpm_members_tbl";
         $memberShipTable = $this->tablePrefix . "swpm_membership_tbl";
         
         // メンバーIDの取得
-        $id = SwpmMemberUtils::get_logged_in_members_id();
+        $membersId = $this->getMembersId();
 
         $bindSql = <<<SQL
 SELECT rd.id,
@@ -201,7 +205,31 @@ AND DATE_FORMAT(rd.date, '%Y%m') >= ${start}
 AND DATE_FORMAT(rd.date, '%Y%m') <= ${end}
 ORDER BY rd.date
 SQL;
-        $sql = $this->wpdb->prepare($bindSql, $id);
+        $sql = $this->wpdb->prepare($bindSql, $membersId);
+        $results = $this->wpdb->get_results($sql, ARRAY_A);
+
+        return $results;
+    }
+
+    /**
+     * DBから自分の報酬全額を取得する
+     *
+     * @return array $results
+     */
+    private function getTotalRewardPrice()
+    {
+        // 必要なテーブルの定義
+        $rewardDetailsTable = $this->tablePrefix . self::REWARD_TABLE;
+        
+        // メンバーIDの取得
+        $membersId = $this->getMembersId();
+
+        $bindSql = <<<SQL
+SELECT sum(price) as price
+FROM ${rewardDetailsTable}
+WHERE member_id = %d
+SQL;
+        $sql = $this->wpdb->prepare($bindSql, $membersId);
         $results = $this->wpdb->get_results($sql, ARRAY_A);
 
         return $results;
@@ -247,5 +275,20 @@ SQL;
         }
         $this->inputData = $inputData;
         $this->outputData = $outputData;
+    }
+    
+    /**
+     * 個人のIDを取得
+     *
+     * @return int $membersId
+     */
+    private function getMembersId()
+    {
+        // メンバーIDの取得
+        if ($this->membersId === null) {
+            $this->membersId = SwpmMemberUtils::get_logged_in_members_id();
+        }
+
+        return $this->membersId;
     }
 }
