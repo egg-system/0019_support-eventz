@@ -5,19 +5,21 @@
 // 画面いっぱいにする
 document.getElementById('main').style.width = '100%';
 </script>
-<div>表示期間：</div>
 
 <form class="form-inline" action="reward_detail_test" method="get">
   <div class="form-group">
     <label>開始</label>
-    <input type="number" class="form-control" placeholder="201801" name="start" value="11">
+    <input type="number" class="form-control" placeholder="201801" name="start" value="<?php echo $rewardDetail->start; ?>">
   </div>
   <div class="form-group">
     <label>終了</label>
-    <input type="number" class="form-control" placeholder="201806" name="end" value="22">
+    <input type="number" class="form-control" placeholder="201806" name="end" value="<?php echo $rewardDetail->end; ?>">
   </div>
   <button type="submit" class="btn btn-primary">変更</button>
 </form>
+<?php if (!empty($rewardDetail->error)) { ?>
+    <div style="color: red;"><?php echo $rewardDetail->error; ?></div>
+<?php } ?>
 
 <?php if (!empty($rewardDetail->results)) { ?>
 <div class="table-responsive">

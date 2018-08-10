@@ -10,13 +10,13 @@ class RewardDetail
     private $tablePrefix;
 
     // テンプレートで使う変数
-    public $start;
-    public $end;
-    public $results;
-    public $allMonth;
-    public $inputData;
-    public $outputData;
-    public $error;
+    public $start = "";
+    public $end = "";
+    public $results = [];
+    public $allMonth = [];
+    public $inputData = [];
+    public $outputData = [];
+    public $error = "";
 
     /**
      * コンストラクタ
@@ -38,16 +38,9 @@ class RewardDetail
      */
     public function exec()
     {
-        $this->allMonth = $this->getMonth();
         $this->setParam();
-        //error_log($this->start."\n", 3, "/tmp/hikaru_error.log");
-        //error_log($this->end."\n", 3, "/tmp/hikaru_error.log");
         $this->results = $this->getRewardData($this->start, $this->end);
         $this->setInputOutput($this->results);
-        error_log(print_r($this->results,true)."\n", 3, "/tmp/hikaru_error.log");
-        error_log(print_r($this->inputData,true)."\n", 3, "/tmp/hikaru_error.log");
-        error_log(print_r($this->outputData,true)."\n", 3, "/tmp/hikaru_error.log");
-
     }
 
     /**
@@ -63,9 +56,7 @@ class RewardDetail
         
         $check = $this->checkParam($this->start, $this->end);
         if (!$check) {
-            $this->error = "開始と終了が不正です";
             // エラーの場合はデフォル値をセット
-            // TODO:getMonthを2回呼んでる
             $this->allMonth = $this->getMonth();
             $this->start = $this->allMonth[self::MAX_TERM - 1];
             $this->end = $this->allMonth[0];
@@ -81,9 +72,66 @@ class RewardDetail
      */
     private function checkParam($start, $end)
     {
-        if (strlen($start) !== 6 && strlen($end) !== 6) {
+        error_log($start."\n", 3, "/tmp/hikaru_error.log");
+        error_log(gettype($start)."\n", 3, "/tmp/hikaru_error.log");
+        error_log($end."\n", 3, "/tmp/hikaru_error.log");
+        error_log(gettype($end)."\n", 3, "/tmp/hikaru_error.log");
+
+        // 未設定の場合はエラーメッセージは出さない
+        if ($start === null && $end === null) {
             return false;
         }
+
+        // 数字以外はNG
+        if (!ctype_digit($start) || !ctype_digit($end)) {
+            $this->error = "開始と終了は数値を入れてください。";
+            return false;
+        }
+
+        // 指定の長さ以外はNG
+        if (strlen($start) !== 6 || strlen($end) !== 6) {
+            $this->error = "開始と終了はYYYYMMの形式で入れてください。(例：201801)";
+            return false;
+        }
+
+        // 日付の妥当性をチェック
+        $startYear = substr($start, 0, 4);
+        $startMonth = substr($start, 4, 2);
+        $endYear = substr($end, 0, 4);
+        $endMonth = substr($end, 4, 2);
+        $day = '01';
+        if (!checkdate($startMonth, $day, $startYear) || !checkdate($endMonth, $day, $endYear)) {
+            $this->error = "開始と終了が存在しない日付です。";
+            return false;
+        }
+
+        // 現在よりも先を設定したらNG
+        if ($end > date("Ym")) {
+            $this->error = "終了に未来の日付は設定できません。";
+            return false;
+        }
+
+        // 最大期間より長い場合はNG
+        $allMonth = $this->getMonth($end);
+        if (!in_array($start, $allMonth)) {
+            $this->error = "表示できる期間は最大${term}ヶ月です。";
+            return false;
+        }
+
+        // 最大期間よりも短く設定してる場合は全体の期間を短くする
+        $monthArray = [];
+        // 終了月からループさせる
+        rsort($allMonth);
+        foreach ($allMonth as $month) {
+            $monthArray[] = $month;
+            // 開始月以前の月は無視する
+            if ($start === $month) {
+                break;
+            }
+        }
+        // 開始月からに並び替え
+        asort($monthArray);
+        $this->allMonth = $monthArray;
 
         return true;
     }
@@ -91,18 +139,27 @@ class RewardDetail
     /**
      * 期間の取得
      *
-     * @return void
+     * @param int $end
+     * @return array $allMonth
      */
-    private function getMonth()
+    private function getMonth($end = null)
     {
         // 取得する期間
-        $maxMonth = date("Ym");
+        if ($end === null) {
+            // デフォルトは現在月
+            $end = date("Ym");
+        }
+        // 1日を足してYYYYMMDDにする
+        $maxDay = $end . "01";
+        // 最大期間
         $term = self::MAX_TERM;
-        $minMonth = date("Ym",strtotime("-${term} month"));
+        // 最小月
+        $minMonth = date("Ym", strtotime("${maxDay} -${term} month"));
+        
         // ループして期間の全ての月を出す
         $allMonth = [];
         for ($i = 0; $i < $term; $i++) {
-            $allMonth[] = date("Ym",strtotime("-${i} month"));
+            $allMonth[] = date("Ym", strtotime("${maxDay} -${i} month"));
         }
         // 月を昇順でソート
         asort($allMonth);
@@ -145,7 +202,6 @@ AND DATE_FORMAT(rd.date, '%Y%m') <= ${end}
 ORDER BY rd.date
 SQL;
         $sql = $this->wpdb->prepare($bindSql, $id);
-        error_log($sql."\n", 3, "/tmp/hikaru_error.log");
         $results = $this->wpdb->get_results($sql, ARRAY_A);
 
         return $results;
