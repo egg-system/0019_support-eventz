@@ -105,7 +105,7 @@ class RewardDetail
             return false;
         }
 
-        // 現在よりも先を設定したらNG
+        // 現在よりも未来を設定したらNG
         if ($end > date("Ym")) {
             $this->error = "終了に未来の日付は設定できません。";
             return false;
@@ -114,7 +114,7 @@ class RewardDetail
         // 最大期間より長い場合はNG
         $allMonth = $this->getMonth($end);
         if (!in_array($start, $allMonth)) {
-            $this->error = "表示できる期間は最大${term}ヶ月です。";
+            $this->error = "表示できる期間は最大" . self::MAX_TERM ."ヶ月です。";
             return false;
         }
 
