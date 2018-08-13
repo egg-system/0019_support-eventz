@@ -47,22 +47,13 @@
         </div>
 
         <?php
-            // 報酬詳細画面に使う情報
-            $rewardDetailPage = 15411;
-            $rewardDetailFile = __DIR__ . '/reward/rewardDetail.php';
-            $rewardDetailTemplateFile = __DIR__ . '/reward/rewardDetailTemplate.php';
-            if ($post->ID === $rewardDetailPage && 
-                file_exists($rewardDetailFile) && 
-                file_exists($rewardDetailTemplateFile) && 
-                SwpmMemberUtils::is_member_logged_in()) {
-
-                // 報酬詳細画面だけの処理を読み込み
-                include_once($rewardDetailFile);
-                // ロジック
-                $rewardDetail = new RewardDetail($wpdb, $table_prefix);
-                $rewardDetail->exec();
-                // テンプレートの読み込み
-                include_once($rewardDetailTemplateFile);
+            // 報酬画面に使う情報
+            $rewardControllerFile = __DIR__ . '/reward/controller.php';
+            if (file_exists($rewardControllerFile)) {
+                include_once($rewardControllerFile);
+                // 報酬画面に必要な処理を読み込み
+                $rewardController = new Reward\Controller($post->ID, $wpdb, $table_prefix);
+                $rewardController->routing();
             }
         ?>
 
