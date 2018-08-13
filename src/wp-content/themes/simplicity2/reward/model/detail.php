@@ -1,5 +1,5 @@
 <?php
-namespace Reward;
+namespace Reward\Model;
 
 class Detail
 {

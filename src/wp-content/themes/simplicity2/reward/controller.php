@@ -46,7 +46,7 @@ class Controller
             include_once(self::DETAIL_MODEL_FILE);
             
             // ロジック
-            $detail = new Detail($this->wpdb, $this->tablePrefix);
+            $detail = new Model\Detail($this->wpdb, $this->tablePrefix);
             $detail->exec();
             
             // テンプレートの読み込み
