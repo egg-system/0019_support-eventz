@@ -8,7 +8,9 @@ class Controller
     const DETAIL_MODEL_FILE = __DIR__ . "/model/detail.php";
     const DETAIL_VIEW_FILE = __DIR__ . "/view/detail.php";
     // 確認ページ
+    const CONFIRM_PAGE_ID = 15673;
     // 完了ページ
+    const DONE_PAGE_ID = 15678;
 
     // ワードプレスのグローバル変数
     private $postId;

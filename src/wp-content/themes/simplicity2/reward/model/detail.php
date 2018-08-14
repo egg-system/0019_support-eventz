@@ -6,7 +6,7 @@ class Detail
     // 最大期間
     const MAX_TERM = 6;
     // ページのURL
-    const PAGE_URL = "reward_detail_test";
+    const PAGE_URL = "reward_detail";
     // テーブル名
     const REWARD_TABLE = "reward_details";
 
