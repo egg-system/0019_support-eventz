@@ -1,18 +1,14 @@
 <?php
 namespace Reward\Model;
 
+use Reward\Constant as Constant;
+
 class Detail
 {
-    // 最大期間
-    const MAX_TERM = 6;
-    // ページのURL
-    const PAGE_URL = "reward_detail";
-    // テーブル名
-    const REWARD_TABLE = "reward_details";
-
     // ワードプレスのグローバル変数
     private $wpdb;
     private $tablePrefix;
+
     // メンバーID
     private $membersId = null;
 
@@ -68,7 +64,7 @@ class Detail
         if (!$check) {
             // エラーの場合はデフォル値をセット
             $this->allMonth = $this->getMonth();
-            $this->start = $this->allMonth[self::MAX_TERM - 1];
+            $this->start = $this->allMonth[Constant::MAX_TERM - 1];
             $this->end = $this->allMonth[0];
         }
     }
@@ -119,7 +115,7 @@ class Detail
         // 最大期間より長い場合はNG
         $allMonth = $this->getMonth($end);
         if (!in_array($start, $allMonth)) {
-            $this->error = "表示できる期間は最大" . self::MAX_TERM ."ヶ月です。";
+            $this->error = "表示できる期間は最大" . Constant::MAX_TERM ."ヶ月です。";
             return false;
         }
 
@@ -157,7 +153,7 @@ class Detail
         // 1日を足してYYYYMMDDにする
         $maxDay = $end . "01";
         // 最大期間
-        $term = self::MAX_TERM;
+        $term = Constant::MAX_TERM;
         // 最小月
         $minMonth = date("Ym", strtotime("${maxDay} -${term} month"));
         
@@ -182,7 +178,7 @@ class Detail
     private function getRewardData($start, $end)
     {
         // 必要なテーブルの定義
-        $rewardDetailsTable = $this->tablePrefix . self::REWARD_TABLE;
+        $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
         $membersTable = $this->tablePrefix . "swpm_members_tbl";
         $memberShipTable = $this->tablePrefix . "swpm_membership_tbl";
         
@@ -220,7 +216,7 @@ SQL;
     private function getTotalRewardPrice()
     {
         // 必要なテーブルの定義
-        $rewardDetailsTable = $this->tablePrefix . self::REWARD_TABLE;
+        $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
         
         // メンバーIDの取得
         $membersId = $this->getMembersId();

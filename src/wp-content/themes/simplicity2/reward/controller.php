@@ -1,17 +1,10 @@
 <?php
 namespace Reward;
 
+include_once(__DIR__ . "/constant.php");
+
 class Controller
 {
-    // 詳細ページ
-    const DETAIL_PAGE_ID = 15411;
-    const DETAIL_MODEL_FILE = __DIR__ . "/model/detail.php";
-    const DETAIL_VIEW_FILE = __DIR__ . "/view/detail.php";
-    // 確認ページ
-    const CONFIRM_PAGE_ID = 15673;
-    // 完了ページ
-    const DONE_PAGE_ID = 15678;
-
     // ワードプレスのグローバル変数
     private $postId;
     private $wpdb;
@@ -39,20 +32,20 @@ class Controller
      */
     public function routing()
     {
-        if ($this->postId === self::DETAIL_PAGE_ID && 
-            file_exists(self::DETAIL_MODEL_FILE) && 
-            file_exists(self::DETAIL_VIEW_FILE) && 
+        if ($this->postId === Constant::DETAIL_PAGE_ID && 
+            file_exists(Constant::DETAIL_MODEL_FILE) && 
+            file_exists(Constant::DETAIL_VIEW_FILE) && 
             \SwpmMemberUtils::is_member_logged_in()) {
 
             // 詳細画面の処理
-            include_once(self::DETAIL_MODEL_FILE);
+            include_once(Constant::DETAIL_MODEL_FILE);
             
             // ロジック
             $detail = new Model\Detail($this->wpdb, $this->tablePrefix);
             $detail->exec();
             
             // テンプレートの読み込み
-            include_once(self::DETAIL_VIEW_FILE);
+            include_once(Constant::DETAIL_VIEW_FILE);
         }
     }
 }
