@@ -46,7 +46,7 @@ class Detail
         $this->results = $this->getRewardData($this->start, $this->end);
         $this->setInputOutput($this->results);
         $this->totalPrice = $this->getTotalRewardPrice();
-        error_log("exec\n", 3, "/tmp/hikaru_error.log");
+        error_log(print_r($this->totalPrice,true)."\n", 3, "/tmp/hikaru_error.log");
     }
 
     /**
@@ -229,7 +229,7 @@ SQL;
         $sql = $this->wpdb->prepare($bindSql, $membersId);
         $results = $this->wpdb->get_results($sql, ARRAY_A);
 
-        return $results;
+        return $results[0]['price'];
     }
 
     /**
