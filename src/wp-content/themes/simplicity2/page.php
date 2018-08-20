@@ -46,17 +46,6 @@
         <?php the_content(); //本文の呼び出し?>
         </div>
 
-        <?php
-            // 報酬画面に使う情報
-            $rewardControllerFile = __DIR__ . '/reward/controller.php';
-            if (file_exists($rewardControllerFile)) {
-                include_once($rewardControllerFile);
-                // 報酬画面に必要な処理を読み込み
-                $rewardController = new Reward\Controller($post->ID, $wpdb, $table_prefix);
-                $rewardController->routing();
-            }
-        ?>
-
         <footer>
           <?php get_template_part('pager-page-links');//ページリンクのページャー?>
 

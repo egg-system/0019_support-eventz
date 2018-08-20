@@ -64,8 +64,8 @@ class Detail
     private function setParam()
     {
         // パラメータの取得
-        $this->start = $_GET['start'];
-        $this->end = $_GET['end'];
+        $this->start = isset($_GET['start']) ? $_GET['start'] : null;
+        $this->end = isset($_GET['end']) ? $_GET['end'] : null;
         
         $check = $this->checkParam($this->start, $this->end);
         if (!$check) {
