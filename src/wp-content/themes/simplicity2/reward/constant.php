@@ -33,4 +33,9 @@ class Constant
 
     // テーブル名
     const REWARD_TABLE = "reward_details";
+
+    // 出金申請できる単位
+    const OUTPUT_UNIT = 1000;
+    // 最小出金金額
+    const MINIMUM_OUTPUT_PRICE = 30000;
 }

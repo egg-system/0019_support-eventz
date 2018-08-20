@@ -2,6 +2,7 @@
 namespace Reward;
 
 include_once(__DIR__ . "/constant.php");
+include_once(__DIR__ . "/lib/dao.php");
 
 class Controller
 {

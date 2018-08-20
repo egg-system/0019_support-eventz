@@ -2,15 +2,14 @@
 namespace Reward\Model;
 
 use Reward\Constant as Constant;
+use Reward\Dao as Dao;
 
 class Detail
 {
-    // ワードプレスのグローバル変数
-    private $wpdb;
-    private $tablePrefix;
-
     // メンバーID
     private $membersId = null;
+    // DBからデータを取得するオブジェクト
+    private $dao = null;
 
     // テンプレートで使う変数
     public $start = "";
@@ -20,6 +19,7 @@ class Detail
     public $inputData = [];
     public $outputData = [];
     public $totalPrice = 0;
+    public $outputPrice = 0;
     public $error = "";
 
     /**
@@ -31,8 +31,7 @@ class Detail
      */
     public function __construct($wpdb, $tablePrefix)
     {
-        $this->wpdb = $wpdb;
-        $this->tablePrefix = $tablePrefix;
+        $this->dao = new Dao($wpdb, $tablePrefix);
     }
 
     /**
@@ -43,10 +42,18 @@ class Detail
     public function exec()
     {
         $this->setParam();
-        $this->results = $this->getRewardData($this->start, $this->end);
+
+        // メンバーIDの取得
+        $membersId = $this->getMembersId();
+
+        $this->results = $this->dao->getRewardData($this->start, $this->end, $membersId);
         $this->setInputOutput($this->results);
-        $this->totalPrice = $this->getTotalRewardPrice();
+        $this->totalPrice = $this->dao->getTotalRewardPrice($membersId);
         error_log(print_r($this->totalPrice,true)."\n", 3, "/tmp/hikaru_error.log");
+
+        // 確認画面からの戻りで使う
+        $this->outputPrice = $this->getOutputPrice();
+        
     }
 
     /**
@@ -169,70 +176,6 @@ class Detail
     }
 
     /**
-     * DBから報酬データの取得
-     *
-     * @param int $start
-     * @param int $end
-     * @return array $results
-     */
-    private function getRewardData($start, $end)
-    {
-        // 必要なテーブルの定義
-        $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
-        $membersTable = $this->tablePrefix . "swpm_members_tbl";
-        $memberShipTable = $this->tablePrefix . "swpm_membership_tbl";
-        
-        // メンバーIDの取得
-        $membersId = $this->getMembersId();
-
-        $bindSql = <<<SQL
-SELECT rd.id,
-       DATE_FORMAT(rd.date, '%Y%m') as date,
-       rd.price,
-       me.member_id,
-       me.first_name,
-       ms.alias
-FROM ${rewardDetailsTable} rd
-LEFT JOIN ${membersTable} me
-    ON rd.introducer_id = me.member_id 
-LEFT JOIN ${memberShipTable} ms
-    ON rd.level = ms.id 
-WHERE rd.member_id = %d
-AND DATE_FORMAT(rd.date, '%Y%m') >= ${start}
-AND DATE_FORMAT(rd.date, '%Y%m') <= ${end}
-ORDER BY rd.date
-SQL;
-        $sql = $this->wpdb->prepare($bindSql, $membersId);
-        $results = $this->wpdb->get_results($sql, ARRAY_A);
-
-        return $results;
-    }
-
-    /**
-     * DBから自分の報酬全額を取得する
-     *
-     * @return array $results
-     */
-    private function getTotalRewardPrice()
-    {
-        // 必要なテーブルの定義
-        $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
-        
-        // メンバーIDの取得
-        $membersId = $this->getMembersId();
-
-        $bindSql = <<<SQL
-SELECT sum(price) as price
-FROM ${rewardDetailsTable}
-WHERE member_id = %d
-SQL;
-        $sql = $this->wpdb->prepare($bindSql, $membersId);
-        $results = $this->wpdb->get_results($sql, ARRAY_A);
-
-        return $results[0]['price'];
-    }
-
-    /**
      * 入金出金データをセット
      *
      * @param array $results
@@ -274,6 +217,16 @@ SQL;
         $this->outputData = $outputData;
     }
     
+    /**
+     * パラメータの取得
+     *
+     * @return string or int
+     */
+    private function getOutputPrice()
+    {
+        return empty($_POST['price']) ? '' : $_POST['price'];
+    }
+
     /**
      * 個人のIDを取得
      *
