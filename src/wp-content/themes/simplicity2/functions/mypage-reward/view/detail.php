@@ -123,3 +123,5 @@ document.getElementById('main').style.width = '100%';
   </div>
   <button type="submit" class="btn btn-success">申請</button>
 </form>
+<div>※出金は<?php echo number_format(Reward\Constant::OUTPUT_UNIT); ?>円単位で申請できます</div>
+<div>※出金は<?php echo number_format(Reward\Constant::MINIMUM_OUTPUT_PRICE); ?>円以上から申請できます</div>

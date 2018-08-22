@@ -77,16 +77,16 @@ class Confirm
         
         // 最低出金金額より少ない場合はエラー
         if ($price < Constant::MINIMUM_OUTPUT_PRICE) {
-            $this->error = "出金金額は" . number_format(Constant::MINIMUM_OUTPUT_PRICE) . "円以上を入力して下さい。";
-            return false;
+            //$this->error = "出金金額は" . number_format(Constant::MINIMUM_OUTPUT_PRICE) . "円以上を入力して下さい。";
+            //return false;
         }
         
         $membersId = $this->getMembersId();
         $totalPrice = $this->dao->getTotalRewardPrice($membersId);
         // 自分の最大報酬金額以上の入力の場合はNG
         if ($price > $totalPrice) {
-            //$this->error = "出金できる金額は最大" . number_format($totalPrice) . "円です。";
-            //return false;
+            $this->error = "出金できる金額は最大" . number_format($totalPrice) . "円です。";
+            return false;
         }
     }
 

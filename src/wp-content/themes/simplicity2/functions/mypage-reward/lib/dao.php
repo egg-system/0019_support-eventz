@@ -23,7 +23,7 @@ class Dao
     }
 
     /**
-     * DBから報酬データの取得
+     * 報酬データの取得
      *
      * @param int $start
      * @param int $end
@@ -61,7 +61,7 @@ SQL;
     }
 
     /**
-     * DBから自分の報酬全額を取得する
+     * 自分の報酬全額を取得する
      *
      * @param int $membersId
      * @return array $results
@@ -80,5 +80,28 @@ SQL;
         $results = $this->wpdb->get_results($sql, ARRAY_A);
 
         return $results[0]['price'];
+    }
+
+    /**
+     * 出金データを登録する
+     *
+     * @param int $membersId
+     * @param int $price
+     * @return array $results
+     */
+    public function insertOutput($membersId, $price)
+    {
+        // 必要なテーブルの定義
+        $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
+        
+        $data = ['member_id' => $membersId,
+                 'date' => current_time('mysql', 1),
+                 'price' => $price];
+        $format = ['%d',
+                   '%s',
+                   '%d'];
+        $results = $this->wpdb->insert($rewardDetailsTable, $data, $format);
+
+        return $results;
     }
 }

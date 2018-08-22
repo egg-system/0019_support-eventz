@@ -2,12 +2,14 @@
 namespace Reward\Model;
 
 use Reward\Constant as Constant;
+use Reward\Dao as Dao;
 
 class Done
 {
-    // ワードプレスのグローバル変数
-    private $wpdb;
-    private $tablePrefix;
+    // メンバーID
+    private $membersId = null;
+    // DBからデータを取得するオブジェクト
+    private $dao = null;
 
     /**
      * コンストラクタ
@@ -18,8 +20,7 @@ class Done
      */
     public function __construct($wpdb, $tablePrefix)
     {
-        $this->wpdb = $wpdb;
-        $this->tablePrefix = $tablePrefix;
+        $this->dao = new Dao($wpdb, $tablePrefix);
     }
 
     /**
@@ -30,8 +31,29 @@ class Done
     public function exec()
     {
         error_log("done exec\n", 3, "/tmp/hikaru_error.log");
+        $price = $this->getParam();
+        error_log($price . "\n", 3, "/tmp/hikaru_error.log");
+        $membersId = $this->getMembersId();
+        // 出金データの登録
+        $result = $this->dao->insertOutput($membersId, -$price);
+        error_log(print_r($result,true)."\n", 3, "/tmp/hikaru_error.log");
+        error_log(gettype($result)."\n", 3, "/tmp/hikaru_error.log");
+        if ($result !== 0) {
+            // 出金申請完了のメールを送る
+            $this->sendDoneMail($price);
+        }
     }
     
+    /**
+     * パラメータの取得
+     *
+     * @return void
+     */
+    private function getParam()
+    {
+        return $_POST['price'];
+    }
+
     /**
      * 個人のIDを取得
      *
@@ -45,5 +67,25 @@ class Done
         }
 
         return $this->membersId;
+    }
+    
+    /**
+     * 完了のメールを送る
+     *
+     * @param int $price
+     * @return void
+     */
+    private function sendDoneMail($price)
+    {
+        // メールアドレスの取得
+        $email = \SwpmMemberUtils::get_member_field_by_id($this->membersId, 'email');
+
+        // メールの内容
+        $subject = '出金申請完了しました';
+        $message = "出金申請が完了しました。\n出金金額：${price}";
+
+        // メール送信
+        $result = wp_mail($email, $subject, $message);
+        error_log(print_r($result,true)."\n", 3, "/tmp/hikaru_error.log");
     }
 }
