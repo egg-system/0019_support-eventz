@@ -40,7 +40,10 @@ class Done
         error_log(gettype($result)."\n", 3, "/tmp/hikaru_error.log");
         if ($result !== 0) {
             // 出金申請完了のメールを送る
-            $this->sendDoneMail($price);
+            $mailDone = $this->sendDoneMail($price);
+            if ($mailDone === true) {
+                // 完了
+            }
         }
     }
     
@@ -73,7 +76,7 @@ class Done
      * 完了のメールを送る
      *
      * @param int $price
-     * @return void
+     * @return bool $result
      */
     private function sendDoneMail($price)
     {
@@ -81,11 +84,13 @@ class Done
         $email = \SwpmMemberUtils::get_member_field_by_id($this->membersId, 'email');
 
         // メールの内容
-        $subject = '出金申請完了しました';
-        $message = "出金申請が完了しました。\n出金金額：${price}";
+        $subject = '[サポートカフェ会]出金申請完了しました';
+        $message = "出金申請が完了しました。\n出金金額：" . number_format($price) . "円";
 
         // メール送信
         $result = wp_mail($email, $subject, $message);
         error_log(print_r($result,true)."\n", 3, "/tmp/hikaru_error.log");
+        error_log(gettype($result)."\n", 3, "/tmp/hikaru_error.log");
+        return $result;
     }
 }
