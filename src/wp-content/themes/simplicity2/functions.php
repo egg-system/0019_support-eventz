@@ -1324,9 +1324,3 @@ function add_meta_query_vars( $public_query_vars ) {
     return $public_query_vars;
 }
 add_filter( 'query_vars', 'add_meta_query_vars' );
-
-add_filter('swpm_email_registration_complete_body', 'convert_nl');
-function convert_nl($message) {
-	return nl2br($message);
-}
-
