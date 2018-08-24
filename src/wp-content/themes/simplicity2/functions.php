@@ -1314,7 +1314,7 @@ add_action('admin_menu', 'remove_menus');
 function remove_admin_bar_menu( $wp_admin_bar ) {
  $wp_admin_bar->remove_menu( 'wp-logo' ); // WordPressシンボルマーク
  $wp_admin_bar->remove_menu('my-account'); // マイアカウント
-   
+
  }
 add_action( 'admin_bar_menu', 'remove_admin_bar_menu', 70 );
 

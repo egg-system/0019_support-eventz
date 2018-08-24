@@ -9,3 +9,5 @@ function include_parent_skins(){
 add_editor_style();
 
 //以下にSimplicity子テーマ用の関数を書く
+
+?>
