@@ -30,14 +30,10 @@ class Done
      */
     public function exec()
     {
-        error_log("done exec\n", 3, "/tmp/hikaru_error.log");
         $price = $this->getParam();
-        error_log($price . "\n", 3, "/tmp/hikaru_error.log");
         $membersId = $this->getMembersId();
         // 出金データの登録
         $result = $this->dao->insertOutput($membersId, -$price);
-        error_log(print_r($result,true)."\n", 3, "/tmp/hikaru_error.log");
-        error_log(gettype($result)."\n", 3, "/tmp/hikaru_error.log");
         if ($result !== 0) {
             // 出金申請完了のメールを送る
             $mailDone = $this->sendDoneMail($price);
@@ -89,8 +85,6 @@ class Done
 
         // メール送信
         $result = wp_mail($email, $subject, $message);
-        error_log(print_r($result,true)."\n", 3, "/tmp/hikaru_error.log");
-        error_log(gettype($result)."\n", 3, "/tmp/hikaru_error.log");
         return $result;
     }
 }

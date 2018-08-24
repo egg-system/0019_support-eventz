@@ -48,7 +48,6 @@ class Detail
         $this->results = $this->dao->getRewardData($this->start, $this->end, $membersId);
         $this->setInputOutput($this->results);
         $this->totalPrice = $this->dao->getTotalRewardPrice($membersId);
-        error_log(print_r($this->totalPrice,true)."\n", 3, "/tmp/hikaru_error.log");
         
     }
 

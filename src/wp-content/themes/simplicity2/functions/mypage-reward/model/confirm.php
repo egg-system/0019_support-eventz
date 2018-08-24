@@ -36,7 +36,6 @@ class Confirm
     {
         $this->price = $this->getParam();
         $result = $this->checkParam($this->price);
-        error_log($this->price . "\n", 3, "/tmp/hikaru_error.log");
     }
     
     /**
@@ -77,8 +76,8 @@ class Confirm
         
         // 最低出金金額より少ない場合はエラー
         if ($price < Constant::MINIMUM_OUTPUT_PRICE) {
-            //$this->error = "出金金額は" . number_format(Constant::MINIMUM_OUTPUT_PRICE) . "円以上を入力して下さい。";
-            //return false;
+            $this->error = "出金金額は" . number_format(Constant::MINIMUM_OUTPUT_PRICE) . "円以上を入力して下さい。";
+            return false;
         }
         
         $membersId = $this->getMembersId();
