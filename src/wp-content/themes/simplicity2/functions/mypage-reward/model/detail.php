@@ -43,7 +43,7 @@ class Detail
         $this->setParam();
 
         // メンバーIDの取得
-        $membersId = $this->getMembersId();
+        $membersId = \SwpmMemberUtils::get_logged_in_members_id();
 
         $this->results = $this->dao->getRewardData($this->start, $this->end, $membersId);
         $this->setInputOutput($this->results);
@@ -210,20 +210,5 @@ class Detail
         }
         $this->inputData = $inputData;
         $this->outputData = $outputData;
-    }
-
-    /**
-     * 個人のIDを取得
-     *
-     * @return int $membersId
-     */
-    private function getMembersId()
-    {
-        // メンバーIDの取得
-        if ($this->membersId === null) {
-            $this->membersId = \SwpmMemberUtils::get_logged_in_members_id();
-        }
-
-        return $this->membersId;
     }
 }
