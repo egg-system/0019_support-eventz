@@ -6,10 +6,11 @@ use Reward\Dao as Dao;
 
 class Done
 {
-    // メンバーID
-    private $membersId = null;
     // DBからデータを取得するオブジェクト
     private $dao = null;
+    
+    // テンプレートで使う変数
+    public $error = "";
 
     /**
      * コンストラクタ
@@ -31,15 +32,14 @@ class Done
     public function exec()
     {
         $price = $this->getParam();
-        $membersId = $this->getMembersId();
+        
+        $membersId = \SwpmMemberUtils::get_logged_in_members_id();
+        
         // 出金データの登録
-        $result = $this->dao->insertOutput($membersId, -$price);
-        if ($result !== 0) {
+        $result = $this->insertOutput($membersId, $price);
+        if ($result) {
             // 出金申請完了のメールを送る
-            $mailDone = $this->sendDoneMail($price);
-            if ($mailDone === true) {
-                // 完了
-            }
+            $mailDone = $this->sendDoneMail($membersId, $price);
         }
     }
     
@@ -52,32 +52,38 @@ class Done
     {
         return $_POST['price'];
     }
-
+    
     /**
-     * 個人のIDを取得
+     * 出金データの登録
      *
-     * @return int $membersId
+     * @param int $membersId
+     * @param int $price
+     * @return bool $result
      */
-    private function getMembersId()
+    private function insertOutput($membersId, $price)
     {
-        // メンバーIDの取得
-        if ($this->membersId === null) {
-            $this->membersId = \SwpmMemberUtils::get_logged_in_members_id();
+        // 出金データの登録
+        $result = $this->dao->insertOutput($membersId, -$price);
+
+        if ($result === 0) {
+            $this->error = "出金申請に失敗しました。";
+            return false;
         }
 
-        return $this->membersId;
+        return true;
     }
     
     /**
      * 完了のメールを送る
      *
+     * @param int $membersId
      * @param int $price
      * @return bool $result
      */
-    private function sendDoneMail($price)
+    private function sendDoneMail($membersId, $price)
     {
         // メールアドレスの取得
-        $email = \SwpmMemberUtils::get_member_field_by_id($this->membersId, 'email');
+        $email = \SwpmMemberUtils::get_member_field_by_id($membersId, 'email');
 
         // メールの内容
         $subject = '[サポートカフェ会]出金申請完了しました';
@@ -85,6 +91,12 @@ class Done
 
         // メール送信
         $result = wp_mail($email, $subject, $message);
-        return $result;
+
+        if ($result === false) {
+            $this->error = "メールの送信に失敗しました。";
+            return false;
+        }
+
+        return true;
     }
 }

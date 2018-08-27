@@ -6,8 +6,6 @@ use Reward\Dao as Dao;
 
 class Confirm
 {
-    // メンバーID
-    private $membersId = null;
     // DBからデータを取得するオブジェクト
     private $dao = null;
 
@@ -80,27 +78,12 @@ class Confirm
             return false;
         }
         
-        $membersId = $this->getMembersId();
+        $membersId = \SwpmMemberUtils::get_logged_in_members_id();
         $totalPrice = $this->dao->getTotalRewardPrice($membersId);
         // 自分の最大報酬金額以上の入力の場合はNG
         if ($price > $totalPrice) {
             $this->error = "出金できる金額は最大" . number_format($totalPrice) . "円です。";
             return false;
         }
-    }
-
-    /**
-     * 個人のIDを取得
-     *
-     * @return int $membersId
-     */
-    private function getMembersId()
-    {
-        // メンバーIDの取得
-        if ($this->membersId === null) {
-            $this->membersId = \SwpmMemberUtils::get_logged_in_members_id();
-        }
-
-        return $this->membersId;
     }
 }
