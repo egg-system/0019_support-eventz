@@ -19,7 +19,6 @@ class Detail
     public $inputData = [];
     public $outputData = [];
     public $totalPrice = 0;
-    public $outputPrice = 0;
     public $error = "";
 
     /**
@@ -49,10 +48,6 @@ class Detail
         $this->results = $this->dao->getRewardData($this->start, $this->end, $membersId);
         $this->setInputOutput($this->results);
         $this->totalPrice = $this->dao->getTotalRewardPrice($membersId);
-        error_log(print_r($this->totalPrice,true)."\n", 3, "/tmp/hikaru_error.log");
-
-        // 確認画面からの戻りで使う
-        $this->outputPrice = $this->getOutputPrice();
         
     }
 
@@ -215,16 +210,6 @@ class Detail
         }
         $this->inputData = $inputData;
         $this->outputData = $outputData;
-    }
-    
-    /**
-     * パラメータの取得
-     *
-     * @return string or int
-     */
-    private function getOutputPrice()
-    {
-        return empty($_POST['price']) ? '' : $_POST['price'];
     }
 
     /**

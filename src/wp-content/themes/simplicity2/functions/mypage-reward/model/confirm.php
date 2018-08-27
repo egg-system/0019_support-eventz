@@ -36,7 +36,6 @@ class Confirm
     {
         $this->price = $this->getParam();
         $result = $this->checkParam($this->price);
-        error_log($this->price . "\n", 3, "/tmp/hikaru_error.log");
     }
     
     /**
@@ -85,8 +84,8 @@ class Confirm
         $totalPrice = $this->dao->getTotalRewardPrice($membersId);
         // 自分の最大報酬金額以上の入力の場合はNG
         if ($price > $totalPrice) {
-            //$this->error = "出金できる金額は最大" . number_format($totalPrice) . "円です。";
-            //return false;
+            $this->error = "出金できる金額は最大" . number_format($totalPrice) . "円です。";
+            return false;
         }
     }
 

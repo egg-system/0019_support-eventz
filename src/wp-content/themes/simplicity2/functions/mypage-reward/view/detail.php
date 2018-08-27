@@ -118,8 +118,10 @@ document.getElementById('main').style.width = '100%';
 <form class="form-inline" action="<?php echo Reward\Constant::CONFIRM_PAGE_URL; ?>" method="post">
   <div class="form-group">
     <label>出金申請金額：</label>
-    <input type="number" class="form-control" placeholder="¥30,000" name="price" value="<?php echo $detail->outputPrice; ?>">
+    <input type="number" class="form-control" placeholder="¥30,000" name="price" value="">
     &nbsp;/&nbsp;<?php echo number_format($detail->totalPrice); ?>
   </div>
   <button type="submit" class="btn btn-success">申請</button>
 </form>
+<div>※出金は<?php echo number_format(Reward\Constant::OUTPUT_UNIT); ?>円単位で申請できます</div>
+<div>※出金は<?php echo number_format(Reward\Constant::MINIMUM_OUTPUT_PRICE); ?>円以上から申請できます</div>
