@@ -2,20 +2,26 @@
 require_once(__DIR__ . '/controller.php');
 
 /**
- * bootstrapの読み込み
+ * css,jsの読み込み
  */
-function enqueue_bootstrap_scripts() {
+function enqueue_mypage_scripts() {
+    // bootstrapファイルの読み込み
     wp_enqueue_script( 
-        'bootstrap-js-script',
+        'bootstrap',
         get_template_directory_uri() . '/functions/mypage-reward/scripts/bootstrap/4.1.3/bootstrap.min.js'
     );
     wp_enqueue_style( 
-        'bootstrap-css-script',
+        'bootstrap',
         get_template_directory_uri() . '/functions/mypage-reward/scripts/bootstrap/4.1.3/bootstrap.min.css'
+    );
+    // カスタムファイルの読み込み
+    wp_enqueue_style( 
+        'custom',
+        get_template_directory_uri() . '/functions/mypage-reward/scripts/custom.css'
     );
 }
 
-add_action('wp_enqueue_scripts', 'enqueue_bootstrap_scripts');
+add_action('wp_enqueue_scripts', 'enqueue_mypage_scripts');
 
 /**
  * マイページ報酬詳細画面
