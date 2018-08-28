@@ -1,11 +1,3 @@
-<!--TODO:bootstrapの読み込み方とタイミングを変える-->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-<script type="text/javascript">
-// 画面いっぱいにする
-document.getElementById('main').style.width = '100%';
-</script>
-
 <form class="form-inline" action="<?php echo Reward\Constant::DETAIL_PAGE_URL; ?>" method="get">
   <div class="form-group">
     <label>開始</label>
@@ -125,3 +117,8 @@ document.getElementById('main').style.width = '100%';
 </form>
 <div>※出金は<?php echo number_format(Reward\Constant::OUTPUT_UNIT); ?>円単位で申請できます</div>
 <div>※出金は<?php echo number_format(Reward\Constant::MINIMUM_OUTPUT_PRICE); ?>円以上から申請できます</div>
+                    
+<script type="text/javascript">
+// 画面いっぱいにする
+document.getElementById('main').style.width = '100%';
+</script>
