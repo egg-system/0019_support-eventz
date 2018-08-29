@@ -1,16 +1,10 @@
 <form class="form-inline" action="<?php echo Reward\Constant::DETAIL_PAGE_URL; ?>" method="get">
-  <div class="form-group">
-    <label>開始</label>
-    <input type="number" class="form-control" placeholder="201801" name="start" value="<?php echo $detail->start; ?>">
-  </div>
-  <div class="form-group">
-    <label>終了</label>
-    <input type="number" class="form-control" placeholder="201806" name="end" value="<?php echo $detail->end; ?>">
-  </div>
+  <input type="number" class="form-control col-4" placeholder="201801" name="start" value="<?php echo $detail->start; ?>">&nbsp;〜&nbsp;
+  <input type="number" class="form-control col-4" placeholder="201806" name="end" value="<?php echo $detail->end; ?>">
   <button type="submit" class="btn btn-primary">変更</button>
 </form>
 <?php if (!empty($detail->error)) { ?>
-    <div style="color: red;"><?php echo $detail->error; ?></div>
+  <div class="alert alert-danger" role="alert"><?php echo $detail->error; ?></div>
 <?php } ?>
 
 <?php if (!empty($detail->results)) { ?>
@@ -107,16 +101,18 @@
     <div>報酬はありません</div>
 <?php } ?>
 
-<form class="form-inline" action="<?php echo Reward\Constant::CONFIRM_PAGE_URL; ?>" method="post">
-  <div class="form-group">
-    <label>出金申請金額：</label>
-    <input type="number" class="form-control" placeholder="¥30,000" name="price" value="">
-    &nbsp;/&nbsp;<?php echo number_format($detail->totalPrice); ?>
+<div class="card bg-light mb-3">
+  <div class="card-header">出金申請</div>
+  <div class="card-body">
+    <form class="form-inline" action="<?php echo Reward\Constant::CONFIRM_PAGE_URL; ?>" method="post">
+      <input type="number" class="form-control col-4" placeholder="¥30,000" name="price" value="">
+      &nbsp;/&nbsp;<?php echo number_format($detail->totalPrice); ?>
+      <button type="submit" class="btn btn-success">申請</button>
+    </form>
+    <div>※出金は<?php echo number_format(Reward\Constant::OUTPUT_UNIT); ?>円単位で申請できます</div>
+    <div>※出金は<?php echo number_format(Reward\Constant::MINIMUM_OUTPUT_PRICE); ?>円以上から申請できます</div>
   </div>
-  <button type="submit" class="btn btn-success">申請</button>
-</form>
-<div>※出金は<?php echo number_format(Reward\Constant::OUTPUT_UNIT); ?>円単位で申請できます</div>
-<div>※出金は<?php echo number_format(Reward\Constant::MINIMUM_OUTPUT_PRICE); ?>円以上から申請できます</div>
+</div>
                     
 <script type="text/javascript">
 // 画面いっぱいにする

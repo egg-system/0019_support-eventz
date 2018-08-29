@@ -1,5 +1,5 @@
 <?php if (!empty($confirm->error)) { ?>
-    <div style="color: red;"><?php echo $confirm->error; ?></div>
+    <div class="alert alert-danger" role="alert"><?php echo $confirm->error; ?></div>
     <form style="float: left;" class="form-inline" action="javascript:history.back();">
       <div class="form-group">
         <input type="hidden" class="form-control" name="price" value="">
