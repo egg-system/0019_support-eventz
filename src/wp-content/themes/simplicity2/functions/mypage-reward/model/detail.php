@@ -19,6 +19,7 @@ class Detail
     public $inputData = [];
     public $outputData = [];
     public $totalPrice = 0;
+    public $pastTotalPrice = 0;
     public $error = "";
 
     /**
@@ -48,7 +49,7 @@ class Detail
         $this->results = $this->dao->getRewardData($this->start, $this->end, $membersId);
         $this->setInputOutput($this->results);
         $this->totalPrice = $this->dao->getTotalRewardPrice($membersId);
-        
+        $this->pastTotalPrice = $this->dao->getPastTotalRewardPrice($this->start, $membersId);
     }
 
     /**

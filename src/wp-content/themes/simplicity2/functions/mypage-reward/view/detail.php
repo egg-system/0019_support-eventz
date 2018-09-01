@@ -79,7 +79,7 @@
                 <td></td>
                 <td></td>
                 <td>累計報酬額</td>
-                <?php $sum = 0 ; ?>
+                <?php $sum = $detail->pastTotalPrice ; ?>
                 <?php foreach ($detail->allMonth as $month) { ?>
                 <?php 
                     foreach ($detail->inputData as $id => $data) {
