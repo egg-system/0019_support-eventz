@@ -1,3 +1,9 @@
+<?php if (!empty($detail->results)) { ?>
+<h3>現時点報酬金額合計</h3>
+<?php echo number_format($detail->totalPrice) . "円"; ?><br>
+<?php echo "(" . date("Y年m月d日") . "時点)"; ?>
+
+<h3>過去の履歴参照</h3>
 <form class="form-inline" action="<?php echo Reward\Constant::DETAIL_PAGE_URL; ?>" method="get">
   <select class="form-control col-3" name="start" value="<?php echo $detail->start; ?>">
     <?php foreach ($detail->selectTerm as $key => $month) { ?>
@@ -11,13 +17,12 @@
       <option <?php echo $selected; ?>><?php echo $month; ?></option>
     <?php } ?>
   </select>
-  <button type="submit" class="btn btn-primary">表示期間変更</button>
+  <button type="submit" class="btn btn-primary btn-sm">表示期間変更</button>
 </form>
 <?php if (!empty($detail->error)) { ?>
   <div class="alert alert-danger" role="alert"><?php echo $detail->error; ?></div>
 <?php } ?>
 
-<?php if (!empty($detail->results)) { ?>
 <div class="table-responsive">
     <table class="table table-condensed">
         <thead>
@@ -107,15 +112,9 @@
         </tbody>
     </table>
 </div>
-<div class="alert alert-light text-right" role="alert" width="200px">
-※表示できる期間は最大6ヶ月です
-</div>
-<?php } else { ?>
-    <div>報酬はありません</div>
-<?php } ?>
 
+<h3>出金申請</h3>
 <div class="card bg-light mb-3">
-  <div class="card-header">出金申請</div>
   <div class="card-body">
     <form class="form-inline" action="<?php echo Reward\Constant::CONFIRM_PAGE_URL; ?>" method="post">
       <input type="number" class="form-control col-4" placeholder="¥30,000" name="price" value="">
@@ -131,3 +130,7 @@
 // 画面いっぱいにする
 document.getElementById('main').style.width = '100%';
 </script>
+<?php } else { ?>
+    <div>報酬はありません</div>
+<?php } ?>
+
