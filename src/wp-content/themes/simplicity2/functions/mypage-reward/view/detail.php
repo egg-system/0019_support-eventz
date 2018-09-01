@@ -1,7 +1,7 @@
 <form class="form-inline" action="<?php echo Reward\Constant::DETAIL_PAGE_URL; ?>" method="get">
-  <input type="number" class="form-control col-4" placeholder="201801" name="start" value="<?php echo $detail->start; ?>">&nbsp;〜&nbsp;
-  <input type="number" class="form-control col-4" placeholder="201806" name="end" value="<?php echo $detail->end; ?>">
-  <button type="submit" class="btn btn-primary">変更</button>
+  <input type="number" class="form-control col-3" placeholder="201801" name="start" value="<?php echo $detail->start; ?>">&nbsp;〜&nbsp;
+  <input type="number" class="form-control col-3" placeholder="201806" name="end" value="<?php echo $detail->end; ?>">
+  <button type="submit" class="btn btn-primary">表示期間変更</button>
 </form>
 <?php if (!empty($detail->error)) { ?>
   <div class="alert alert-danger" role="alert"><?php echo $detail->error; ?></div>
