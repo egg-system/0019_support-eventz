@@ -20,6 +20,7 @@ class Detail
     public $outputData = [];
     public $totalPrice = 0;
     public $pastTotalPrice = 0;
+    public $selectTerm = [];
     public $error = "";
 
     /**
@@ -48,8 +49,12 @@ class Detail
 
         $this->results = $this->dao->getRewardData($this->start, $this->end, $membersId);
         $this->setInputOutput($this->results);
+        // 全期間の合計報酬
         $this->totalPrice = $this->dao->getTotalRewardPrice($membersId);
+        // 表示期間外の過去分の合計報酬
         $this->pastTotalPrice = $this->dao->getPastTotalRewardPrice($this->start, $membersId);
+        // 選択できる期間
+        $this->selectTerm = $this->getSelectTerm();
     }
 
     /**
@@ -95,6 +100,12 @@ class Detail
         // 指定の長さ以外はNG
         if (strlen($start) !== 6 || strlen($end) !== 6) {
             $this->error = "開始と終了はYYYYMMの形式で入れてください。(例：201801)";
+            return false;
+        }
+
+        // 開始と終了のチェック
+        if ($start > $end) {
+            $this->error = "年月指定が不正です。";
             return false;
         }
 
@@ -167,6 +178,32 @@ class Detail
         }
         // 月を昇順でソート
         asort($allMonth);
+
+        return $allMonth;
+    }
+    
+    /**
+     * 開始終了の選択肢を取得
+     *
+     * @return array $term
+     */
+    private function getSelectTerm()
+    {
+        // TODO:仮で決め
+        $start = "201701";
+        $end = date("Ym");
+        // 1日を足して必ず1日にする
+        $endDay = $end . "01";
+
+        // ループして期間の全ての月を出す
+        $allMonth = [];
+        $i = 0;
+        $month = null;
+        while ($month !== $start) {
+            $i++;
+            $month = date("Ym", strtotime("${endDay} -${i} month"));
+            $allMonth[] = $month;
+        }
 
         return $allMonth;
     }

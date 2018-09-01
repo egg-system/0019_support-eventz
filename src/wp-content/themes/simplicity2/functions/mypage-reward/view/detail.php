@@ -1,6 +1,16 @@
 <form class="form-inline" action="<?php echo Reward\Constant::DETAIL_PAGE_URL; ?>" method="get">
-  <input type="number" class="form-control col-3" placeholder="201801" name="start" value="<?php echo $detail->start; ?>">&nbsp;〜&nbsp;
-  <input type="number" class="form-control col-3" placeholder="201806" name="end" value="<?php echo $detail->end; ?>">
+  <select class="form-control col-3" name="start" value="<?php echo $detail->start; ?>">
+    <?php foreach ($detail->selectTerm as $key => $month) { ?>
+      <?php $selected = ($month === $detail->start) ? "selected" : ""; ?>
+      <option <?php echo $selected; ?>><?php echo $month; ?></option>
+    <?php } ?>
+  </select>&nbsp;〜&nbsp;
+  <select class="form-control col-3" name="end">
+    <?php foreach ($detail->selectTerm as $key => $month) { ?>
+      <?php $selected = ($month === $detail->end) ? "selected" : ""; ?>
+      <option <?php echo $selected; ?>><?php echo $month; ?></option>
+    <?php } ?>
+  </select>
   <button type="submit" class="btn btn-primary">表示期間変更</button>
 </form>
 <?php if (!empty($detail->error)) { ?>
@@ -32,7 +42,7 @@
                     <td></td>
                     <td><?php echo $data[0]['alias']; ?></td>
                     <?php foreach ($detail->allMonth as $month) { ?>
-                        <td><?php echo isset($data[$month]['price']) ? '¥' . number_format($data[$month]['price']) : '¥0'; ?></td>
+                        <td class="text-right"><?php echo isset($data[$month]['price']) ? '¥' . number_format($data[$month]['price']) : '¥0'; ?></td>
                     <?php } ?>
                 </tr>
                 <?php $number++ ; ?>
@@ -59,7 +69,7 @@
                         $price = isset($data[$month]['price']) ? $data[$month]['price'] : 0;
                         $sum += $price;
                     } ?>
-                    <td><?php echo '¥' . number_format($sum); ?></td>
+                    <td class="text-right"><?php echo '¥' . number_format($sum); ?></td>
                 <?php } ?>
             </tr>
             <tr>
@@ -70,7 +80,7 @@
                 <td>出金申請額</td>
                 <?php foreach ($detail->allMonth as $month) { ?>
                     <?php $price = isset($detail->outputData[$month]) ? abs($detail->outputData[$month]) : 0; ?>
-                    <td><?php echo '¥' . number_format($price); ?></td>
+                    <td class="text-right"><?php echo '¥' . number_format($price); ?></td>
                 <?php } ?>
             </tr>
             <tr>
@@ -91,11 +101,14 @@
                     $output = isset($detail->outputData[$month]) ? abs($detail->outputData[$month]) : 0;
                     $sum -= $output;
                 ?>
-                    <td><?php echo '¥' . number_format($sum); ?></td>
+                    <td class="text-right"><?php echo '¥' . number_format($sum); ?></td>
                 <?php } ?>
             </tr>
         </tbody>
     </table>
+</div>
+<div class="alert alert-light text-right" role="alert" width="200px">
+※表示できる期間は最大6ヶ月です
 </div>
 <?php } else { ?>
     <div>報酬はありません</div>
