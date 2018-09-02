@@ -35,7 +35,7 @@ class Confirm
         $this->price = $this->getParam();
         $result = $this->checkParam($this->price);
     }
-    
+
     /**
      * パラメータの取得
      *
@@ -45,7 +45,7 @@ class Confirm
     {
         return $_POST['price'];
     }
-    
+
     /**
      * 引数のチェック
      *
@@ -59,7 +59,7 @@ class Confirm
             $this->error = "出金金額を入力して下さい。";
             return false;
         }
-        
+
         // 数字以外はNG
         if (!ctype_digit($price)) {
             $this->error = "出金金額は数値を入れてください。";
@@ -71,13 +71,13 @@ class Confirm
             $this->error = "出金金額は" . number_format(Constant::OUTPUT_UNIT) . "円単位で入力して下さい。";
             return false;
         }
-        
+
         // 最低出金金額より少ない場合はエラー
         if ($price < Constant::MINIMUM_OUTPUT_PRICE) {
-            $this->error = "出金金額は" . number_format(Constant::MINIMUM_OUTPUT_PRICE) . "円以上を入力して下さい。";
-            return false;
+            //$this->error = "出金金額は" . number_format(Constant::MINIMUM_OUTPUT_PRICE) . "円以上を入力して下さい。";
+            //return false;
         }
-        
+
         $membersId = \SwpmMemberUtils::get_logged_in_members_id();
         $totalPrice = $this->dao->getTotalRewardPrice($membersId);
         // 自分の最大報酬金額以上の入力の場合はNG
