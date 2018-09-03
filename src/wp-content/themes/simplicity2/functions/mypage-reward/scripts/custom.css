@@ -24,3 +24,10 @@
     border-radius: 5px;
     background: #666;
 }
+
+/* 表示期間のフォント調整 */
+@media screen and (max-width: 480px) {
+    .form-control {
+        font-size: 0.7rem;
+    }
+}
