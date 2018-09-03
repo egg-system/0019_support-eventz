@@ -8,3 +8,19 @@
     /*width:200px;*/
     white-space: nowrap;
 }
+
+/* スクロールバーを常に表示させる */
+.table-responsive {
+    overflow-x: auto;
+}
+.table-responsive::-webkit-scrollbar {
+    height: 5px;
+}
+.table-responsive::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background: #eee;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: #666;
+}
