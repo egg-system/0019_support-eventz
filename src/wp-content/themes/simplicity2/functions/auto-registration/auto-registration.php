@@ -22,7 +22,7 @@ class AutoRegistration {
      */
      public function after_registration($form_data){
        $member_level = $form_data['membership_level'];
-       if (in_array($member_level, Constant::MEMBER_LEVEL_ARY, true)) {
+       if (in_array(intval($member_level), Constant::MEMBER_LEVEL_ARY, true)) {
           $email = $form_data['email'];
           $tel = $form_data['phone'];
           $money = $this->_getMemberFee($member_level);
@@ -65,13 +65,13 @@ class AutoRegistration {
            // フォームにて入力された分のレコードの更新
            $member_table = $this->tablePrefix."swpm_members_tbl";
            $upd_result = $this->wpdb->update($member_table, array('membership_level' => $level), array('email' => $_GET['email']));
-           if (false == $upd_result) {
+           if (false === $upd_result) {
              echo('updateでエラーが発生しました');
              return;
            }
 
            $ins_result = $this->_insertIntroducedReward($email);
-           if (false == $ins_result) {
+           if (false === $ins_result) {
              echo('updateでエラーが発生しました');
              return;
            }
@@ -119,7 +119,7 @@ class AutoRegistration {
         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no') {
             $member_table = $this->tablePrefix."swpm_members_tbl";
             $upd_result = $this->wpdb->update($member_table, array('membership_level' => Constant::UNPAID_MEMBER_LEVEL), array('email' => $_GET['email']));
-            if (false == $upd_result) {
+            if (false === $upd_result) {
               echo('updateでエラーが発生しました。');
               return;
             }
@@ -131,7 +131,7 @@ class AutoRegistration {
         if ($is_telecom_access && isset($_GET['email'])) {
             $email = $_GET['email'];
             $ins_result = $this->_insertIntroducedReward($email);
-            if (false == $ins_result) {
+            if (false === $ins_result) {
               echo('updateでエラーが発生しました');
               return;
             }
@@ -147,7 +147,7 @@ class AutoRegistration {
      */
     private function _isTelecomIpAccessed() {
         $remoteIp = $_SERVER["REMOTE_ADDR"];
-        return in_array($remoteIp, Constant::TELECOM_IP_FROM_TO);
+        return in_array($remoteIp, Constant::TELECOM_IP_FROM_TO, true);
     }
 
     /**
@@ -189,11 +189,11 @@ class AutoRegistration {
 
         // 必要なテーブルの定義
         $rewardTable = $this->tablePrefix."reward_details";
-        $data = [`member_id` => $member['member_id'],
-                 `introducer_id` => $member['introducer_id'],
-                 `date` => CURRENT_TIMESTAMP(),
-                 `level` => $member['level'],
-                 `price` => $rewardPrice
+        $data = ['member_id' => $member['member_id'],
+                 'introducer_id' => $member['introducer_id'],
+                 'date' => CURRENT_TIMESTAMP(),
+                 'level' => $member['level'],
+                 'price' => $rewardPrice
                ];
         $format = ['%d',
                    '%d',
