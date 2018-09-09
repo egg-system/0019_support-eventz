@@ -42,6 +42,8 @@ class Constant
   const PRODUCT_CLIENT_IP = '95518';
   // テレコムIPは下記固定で共通
   const TELECOM_IP_FROM_TO = array('52.196.8.0', '54.65.177.67', '54.95.89.20', '54.238.8.174');
+  // リダイレクト先
+  const REDIRECT_URL = "/register_complete";
   // サポートカフェサイトURL
   const SITE_URL = 'http://sample004.eggsystem.co.jp';
   // サポートカフェ テレコムクレジット決済URL

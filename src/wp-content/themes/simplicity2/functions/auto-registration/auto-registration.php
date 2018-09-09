@@ -21,8 +21,8 @@ class AutoRegistration {
      * @return void
      */
      public function after_registration($form_data){
-         $member_level = $form_data['membership_level'];
-       if (in_array($member_level, Constant::MEMBER_LEVEL_ARY)) {
+       $member_level = $form_data['membership_level'];
+       if (in_array($member_level, Constant::MEMBER_LEVEL_ARY, true)) {
           $email = $form_data['email'];
           $tel = $form_data['phone'];
           $money = $this->_getMemberFee($member_level);
@@ -30,7 +30,8 @@ class AutoRegistration {
           if (empty($email) || empty($tel) || is_null($money)) {
             return;
           }
-          $redirectUrl = site_url()."/register_complete";
+
+          $redirectUrl = site_url().Constant::REDIRECT_URL;
           // $client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
           $client_ip = (site_url() == Constant::SITE_URL) ? Constant::TEST_CLIENT_IP : Constant::PRODUCT_CLIENT_IP; // テスト用
 
@@ -49,25 +50,37 @@ class AutoRegistration {
      * @return void
      */
      public function receive_telecom_result() {
-       //IPアドレスでテレコムからのアクセスであることを確認
+         //IPアドレスでテレコムからのアクセスであることを確認
          $is_telecom_access = $this->_isTelecomIpAccessed();
-       if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && isset($_GET['money']) && $_GET['rel'] == 'yes') {
-          $email = $_GET['email'];
-          $fee = $_GET['money'];
-          $level = $this->_getMemberLevel($fee);
-          // 会員レベルの取得が出来ていない場合処理なし
-          if (is_null($level)) return;
+         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && isset($_GET['money']) && $_GET['rel'] == 'yes') {
+           $email = $_GET['email'];
+           $fee = $_GET['money'];
+           $level = $this->_getMemberLevel($fee);
+           // 会員レベルの取得が出来ていない場合処理なし
+           if (is_null($level)) {
+             echo('会員レベルの取得に失敗しました');
+             return;
+           }
 
-          // フォームにて入力された分のレコードの更新
-          $member_table = $this->tablePrefix."swpm_members_tbl";
-          $this->wpdb->update($member_table, array('membership_level' => $level), array('email' => $_GET['email']));
+           // フォームにて入力された分のレコードの更新
+           $member_table = $this->tablePrefix."swpm_members_tbl";
+           $upd_result = $this->wpdb->update($member_table, array('membership_level' => $level), array('email' => $_GET['email']));
+           if (false == $upd_result) {
+             echo('updateでエラーが発生しました');
+             return;
+           }
 
-          $this->_insertIntroducedReward($email);
-          $this->_sendInitPaymentMail($email);
-          echo('決済認証成功');
-        } else {
-          echo('決済認証失敗');
-        }
+           $ins_result = $this->_insertIntroducedReward($email);
+           if (false == $ins_result) {
+             echo('updateでエラーが発生しました');
+             return;
+           }
+
+           $this->_sendInitPaymentMail($email);
+           echo('決済認証成功');
+         } else {
+           echo('決済認証失敗');
+         }
     }
 
 
@@ -104,10 +117,12 @@ class AutoRegistration {
         }
 
         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no') {
-            //global $wpdb; $this->tablePrefix
-            //$member_table = "{$wpdb->prefix}swpm_members_tbl";
-            $member_table = $this->tablePrefix . "swpm_members_tbl";
-            $this->wpdb->update($member_table, array('membership_level' => Constant::UNPAID_MEMBER_LEVEL), array('email' => $_GET['email']));
+            $member_table = $this->tablePrefix."swpm_members_tbl";
+            $upd_result = $this->wpdb->update($member_table, array('membership_level' => Constant::UNPAID_MEMBER_LEVEL), array('email' => $_GET['email']));
+            if (false == $upd_result) {
+              echo('updateでエラーが発生しました。');
+              return;
+            }
 
             echo('継続決済失敗データを受信しました。');
             return;
@@ -115,7 +130,11 @@ class AutoRegistration {
 
         if ($is_telecom_access && isset($_GET['email'])) {
             $email = $_GET['email'];
-            $this->_insertIntroducedReward($email);
+            $ins_result = $this->_insertIntroducedReward($email);
+            if (false == $ins_result) {
+              echo('updateでエラーが発生しました');
+              return;
+            }
         }
         echo('決済データを受信しました。');
     }
@@ -155,24 +174,35 @@ class AutoRegistration {
     }
 
     function _insertIntroducedReward($email) {
-      $member = $this->_getMember($email);
+        $member = $this->_getMember($email);
 
-      // 紹介者IDが取得できない場合、
-      if (!array_key_exists('introducer_id', $member) && is_null($member['introducer_id'])) {
-        return;
-      }
+        // 紹介者IDが取得できない場合、
+        if (!array_key_exists('introducer_id', $member) && is_null($member['introducer_id'])) {
+          return;
+        }
 
-      // 報酬がない場合も処理なし
-      $rewardPrice = $this->_getRewardPrice($member['level']);
-      if (is_null($rewardPrice)) {
-        return;
-      }
+        // 報酬がない場合も処理なし
+        $rewardPrice = $this->_getRewardPrice($member['level']);
+        if (is_null($rewardPrice)) {
+          return;
+        }
 
-      global $wpdb;
-      $rewardTable = "{$wpdb->prefix}reward_details";
-      $insertSql = "
-          INSERT INTO {$rewardTable} (`member_id`, `introducer_id`, `date`, `level`, `price`)
-          VALUES ({$member['member_id']}, {$member['introducer_id']}, CURRENT_TIMESTAMP(), {$member['level']}, {$rewardPrice});";
+        // 必要なテーブルの定義
+        $rewardTable = $this->tablePrefix."reward_details";
+        $data = [`member_id` => $member['member_id'],
+                 `introducer_id` => $member['introducer_id'],
+                 `date` => CURRENT_TIMESTAMP(),
+                 `level` => $member['level'],
+                 `price` => $rewardPrice
+               ];
+        $format = ['%d',
+                   '%d',
+                   '%s',
+                   '%d',
+                   '%d'];
+        $results = $this->wpdb->insert($rewardTable, $data, $format);
+
+        return $results;
     }
 
     private function _getRewardPrice($level) {
@@ -188,10 +218,9 @@ class AutoRegistration {
     }
 
     private function _getMember($email) {
-      global $wpdb;
-      $memberTable = "{$wpdb->prefix}swpm_members_tbl";
+      $memberTable = $this->tablePrefix."swpm_members_tbl";
 
-      return  $wpdb->get_row("
+      return  $this->wpdb->get_row("
         SELECT
           {$memberTable}.member_id AS member_id,
           introducerTable.member_id AS introducer_id,
