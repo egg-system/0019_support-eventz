@@ -61,7 +61,7 @@ class Detail
         // パラメータの取得
         $this->start = isset($_GET['start']) ? $_GET['start'] : null;
         $this->end = isset($_GET['end']) ? $_GET['end'] : null;
-
+        
         $check = $this->checkParam($this->start, $this->end);
         if (!$check) {
             // エラーの場合はデフォル値をセット
@@ -158,7 +158,7 @@ class Detail
         $term = Constant::MAX_TERM;
         // 最小月
         $minMonth = date("Ym", strtotime("${maxDay} -${term} month"));
-
+        
         // ループして期間の全ての月を出す
         $allMonth = [];
         for ($i = 0; $i < $term; $i++) {
@@ -211,22 +211,4 @@ class Detail
         $this->inputData = $inputData;
         $this->outputData = $outputData;
     }
-<<<<<<< Updated upstream
-=======
-
-    /**
-     * 個人のIDを取得
-     *
-     * @return int $membersId
-     */
-    private function getMembersId()
-    {
-        // メンバーIDの取得
-        if ($this->membersId === null) {
-            $this->membersId = \SwpmMemberUtils::get_logged_in_members_id();
-        }
-
-        return $this->membersId;
-    }
->>>>>>> Stashed changes
 }
