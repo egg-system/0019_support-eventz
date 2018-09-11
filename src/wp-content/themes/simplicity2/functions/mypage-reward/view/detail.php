@@ -1,27 +1,28 @@
-<!--TODO:bootstrapの読み込み方とタイミングを変える-->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-<script type="text/javascript">
-// 画面いっぱいにする
-document.getElementById('main').style.width = '100%';
-</script>
+<?php if (!empty($detail->results)) { ?>
+<h3>現時点報酬金額合計</h3>
+<?php echo number_format($detail->totalPrice) . "円"; ?><br>
+<?php echo "(" . date("Y年m月d日") . "時点)"; ?>
 
+<h3>過去の履歴参照</h3>
 <form class="form-inline" action="<?php echo Reward\Constant::DETAIL_PAGE_URL; ?>" method="get">
-  <div class="form-group">
-    <label>開始</label>
-    <input type="number" class="form-control" placeholder="201801" name="start" value="<?php echo $detail->start; ?>">
-  </div>
-  <div class="form-group">
-    <label>終了</label>
-    <input type="number" class="form-control" placeholder="201806" name="end" value="<?php echo $detail->end; ?>">
-  </div>
-  <button type="submit" class="btn btn-primary">変更</button>
+  <select class="form-control col-3" name="start" value="<?php echo $detail->start; ?>">
+    <?php foreach ($detail->selectTerm as $key => $month) { ?>
+      <?php $selected = ($month === $detail->start) ? "selected" : ""; ?>
+      <option <?php echo $selected; ?>><?php echo $month; ?></option>
+    <?php } ?>
+  </select>&nbsp;〜&nbsp;
+  <select class="form-control col-3" name="end">
+    <?php foreach ($detail->selectTerm as $key => $month) { ?>
+      <?php $selected = ($month === $detail->end) ? "selected" : ""; ?>
+      <option <?php echo $selected; ?>><?php echo $month; ?></option>
+    <?php } ?>
+  </select>
+  <button type="submit" class="btn btn-primary btn-sm">表示期間変更</button>
 </form>
 <?php if (!empty($detail->error)) { ?>
-    <div style="color: red;"><?php echo $detail->error; ?></div>
+  <div class="alert alert-danger" role="alert"><?php echo $detail->error; ?></div>
 <?php } ?>
 
-<?php if (!empty($detail->results)) { ?>
 <div class="table-responsive">
     <table class="table table-condensed">
         <thead>
@@ -46,7 +47,7 @@ document.getElementById('main').style.width = '100%';
                     <td></td>
                     <td><?php echo $data[0]['alias']; ?></td>
                     <?php foreach ($detail->allMonth as $month) { ?>
-                        <td><?php echo isset($data[$month]['price']) ? '¥' . number_format($data[$month]['price']) : '¥0'; ?></td>
+                        <td class="text-right"><?php echo isset($data[$month]['price']) ? '¥' . number_format($data[$month]['price']) : '¥0'; ?></td>
                     <?php } ?>
                 </tr>
                 <?php $number++ ; ?>
@@ -73,7 +74,7 @@ document.getElementById('main').style.width = '100%';
                         $price = isset($data[$month]['price']) ? $data[$month]['price'] : 0;
                         $sum += $price;
                     } ?>
-                    <td><?php echo '¥' . number_format($sum); ?></td>
+                    <td class="text-right"><?php echo '¥' . number_format($sum); ?></td>
                 <?php } ?>
             </tr>
             <tr>
@@ -84,7 +85,7 @@ document.getElementById('main').style.width = '100%';
                 <td>出金申請額</td>
                 <?php foreach ($detail->allMonth as $month) { ?>
                     <?php $price = isset($detail->outputData[$month]) ? abs($detail->outputData[$month]) : 0; ?>
-                    <td><?php echo '¥' . number_format($price); ?></td>
+                    <td class="text-right"><?php echo '¥' . number_format($price); ?></td>
                 <?php } ?>
             </tr>
             <tr>
@@ -93,7 +94,7 @@ document.getElementById('main').style.width = '100%';
                 <td></td>
                 <td></td>
                 <td>累計報酬額</td>
-                <?php $sum = 0 ; ?>
+                <?php $sum = $detail->pastTotalPrice ; ?>
                 <?php foreach ($detail->allMonth as $month) { ?>
                 <?php 
                     foreach ($detail->inputData as $id => $data) {
@@ -105,23 +106,31 @@ document.getElementById('main').style.width = '100%';
                     $output = isset($detail->outputData[$month]) ? abs($detail->outputData[$month]) : 0;
                     $sum -= $output;
                 ?>
-                    <td><?php echo '¥' . number_format($sum); ?></td>
+                    <td class="text-right"><?php echo '¥' . number_format($sum); ?></td>
                 <?php } ?>
             </tr>
         </tbody>
     </table>
 </div>
+
+<h3>出金申請</h3>
+<div class="card bg-light mb-3">
+  <div class="card-body">
+    <form class="form-inline" action="<?php echo Reward\Constant::CONFIRM_PAGE_URL; ?>" method="post">
+      <input type="number" class="form-control col-4" placeholder="¥30,000" name="price" value="">
+      &nbsp;/&nbsp;<?php echo number_format($detail->totalPrice); ?>
+      <button type="submit" class="btn btn-success">申請</button>
+    </form>
+    <div>※出金は<?php echo number_format(Reward\Constant::OUTPUT_UNIT); ?>円単位で申請できます</div>
+    <div>※出金は<?php echo number_format(Reward\Constant::MINIMUM_OUTPUT_PRICE); ?>円以上から申請できます</div>
+  </div>
+</div>
+                    
+<script type="text/javascript">
+// 画面いっぱいにする
+document.getElementById('main').style.width = '100%';
+</script>
 <?php } else { ?>
     <div>報酬はありません</div>
 <?php } ?>
 
-<form class="form-inline" action="<?php echo Reward\Constant::CONFIRM_PAGE_URL; ?>" method="post">
-  <div class="form-group">
-    <label>出金申請金額：</label>
-    <input type="number" class="form-control" placeholder="¥30,000" name="price" value="">
-    &nbsp;/&nbsp;<?php echo number_format($detail->totalPrice); ?>
-  </div>
-  <button type="submit" class="btn btn-success">申請</button>
-</form>
-<div>※出金は<?php echo number_format(Reward\Constant::OUTPUT_UNIT); ?>円単位で申請できます</div>
-<div>※出金は<?php echo number_format(Reward\Constant::MINIMUM_OUTPUT_PRICE); ?>円以上から申請できます</div>

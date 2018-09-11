@@ -83,6 +83,30 @@ SQL;
     }
 
     /**
+     * 表示期間外の過去分の報酬全額を取得する
+     *
+     * @param int $start
+     * @param int $membersId
+     * @return array $results
+     */
+    public function getPastTotalRewardPrice($start, $membersId)
+    {
+        // 必要なテーブルの定義
+        $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
+        
+        $bindSql = <<<SQL
+SELECT sum(price) as price
+FROM ${rewardDetailsTable}
+WHERE member_id = %d
+AND DATE_FORMAT(date, '%Y%m') < ${start}
+SQL;
+        $sql = $this->wpdb->prepare($bindSql, $membersId);
+        $results = $this->wpdb->get_results($sql, ARRAY_A);
+
+        return $results[0]['price'];
+    }
+
+    /**
      * 出金データを登録する
      *
      * @param int $membersId
