@@ -31,6 +31,7 @@ class Constant
     // テーブル名
     const REWARD_TABLE = "reward_details";
     const MEMBERS_TABLE = "swpm_members_tbl";
+    const MEMBERSHIP_TABLE = "swpm_membership_tbl";
 
     // 出金申請できる単位
     const OUTPUT_UNIT = 1000;

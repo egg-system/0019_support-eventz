@@ -34,8 +34,8 @@ class Dao
     {
         // 必要なテーブルの定義
         $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
-        $membersTable = $this->tablePrefix . "swpm_members_tbl";
-        $memberShipTable = $this->tablePrefix . "swpm_membership_tbl";
+        $membersTable = $this->tablePrefix . Constant::MEMBERS_TABLE;
+        $memberShipTable = $this->tablePrefix . Constant::MEMBERSHIP_TABLE;
         
         $bindSql = <<<SQL
 SELECT rd.id,
