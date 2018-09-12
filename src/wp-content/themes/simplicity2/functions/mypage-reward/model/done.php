@@ -92,7 +92,7 @@ class Done
         $siteMail = Constant::SITE_MAIL;
 
         // メールの内容
-        $subject = '[サポートカフェ会]出金申請完了しました';
+        $subject = '[サポートイベント運営事務局]出金申請完了しました';
         $message = <<<TEXT
 ${name} 様
 
