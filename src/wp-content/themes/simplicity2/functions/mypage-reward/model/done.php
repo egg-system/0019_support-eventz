@@ -110,7 +110,7 @@ ${name} 様
 ${nowDate}
 
 ・出金申請額
-${price}
+${price}円
 
 
 ---
