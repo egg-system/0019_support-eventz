@@ -24,6 +24,9 @@ class Controller
         $this->postId = $postId;
         $this->wpdb = $wpdb;
         $this->tablePrefix = $tablePrefix;
+
+        // タイムゾーンのセット
+        date_default_timezone_set('Asia/Tokyo');
     }
 
     /**
