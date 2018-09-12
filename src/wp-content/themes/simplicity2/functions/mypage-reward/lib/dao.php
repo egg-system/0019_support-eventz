@@ -128,4 +128,28 @@ SQL;
 
         return $results;
     }
+
+    /**
+     * ユーザー情報の取得
+     *
+     * @param int $membersId
+     * @return array $results
+     */
+    public function getMemberInfo($membersId)
+    {
+        // 必要なテーブルの定義
+        $membersTable = $this->tablePrefix . Constant::MEMBERS_TABLE;
+
+        $bindSql = <<<SQL
+SELECT 
+    first_name,
+    email
+FROM ${membersTable}
+WHERE member_id = %d
+SQL;
+        $sql = $this->wpdb->prepare($bindSql, $membersId);
+        $results = $this->wpdb->get_results($sql, ARRAY_A);
+
+        return $results[0];
+    }
 }

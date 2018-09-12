@@ -30,9 +30,13 @@ class Constant
 
     // テーブル名
     const REWARD_TABLE = "reward_details";
+    const MEMBERS_TABLE = "swpm_members_tbl";
 
     // 出金申請できる単位
     const OUTPUT_UNIT = 1000;
     // 最小出金金額
     const MINIMUM_OUTPUT_PRICE = 30000;
+
+    // サイトの管理者メール
+    const SITE_MAIL = "cafesuppo@gmail.com";
 }

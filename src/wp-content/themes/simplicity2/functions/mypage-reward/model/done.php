@@ -82,15 +82,44 @@ class Done
      */
     private function sendDoneMail($membersId, $price)
     {
-        // メールアドレスの取得
-        $email = \SwpmMemberUtils::get_member_field_by_id($membersId, 'email');
+        // 必要なユーザーデータの取得
+        $memberInfo = $this->dao->getMemberInfo($membersId);
+
+        // 本文に必要なデータ
+        $name = $memberInfo['first_name'];
+        $nowDate = date('Y/m/d');
+        $price = number_format($price);
+        $siteMail = Constant::SITE_MAIL;
 
         // メールの内容
         $subject = '[サポートカフェ会]出金申請完了しました';
-        $message = "出金申請が完了しました。\n出金金額：" . number_format($price) . "円";
+        $message = <<<TEXT
+${name} 様
+
+サポートイベント運営事務局です。
+
+以下の内容で出金申請を受け付けました。
+
+お振込まで、いましばらくお待ちください。
+
+
+==============================
+　出金申請内容
+==============================
+・出金申請日
+${nowDate}
+
+・出金申請額
+${price}
+
+
+---
+サポートイベント運営事務局
+${siteMail}
+TEXT;
 
         // メール送信
-        $result = wp_mail($email, $subject, $message);
+        $result = wp_mail($memberInfo['email'], $subject, $message);
 
         if ($result === false) {
             $this->error = "メールの送信に失敗しました。";
