@@ -1,4 +1,3 @@
-<?php if (!empty($detail->results)) { ?>
 <h3>現時点報酬金額合計</h3>
 <?php echo number_format($detail->totalPrice) . "円"; ?><br>
 <?php echo "(" . date("Y年m月d日") . "時点)"; ?>
@@ -23,6 +22,7 @@
   <div class="alert alert-danger" role="alert"><?php echo $detail->error; ?></div>
 <?php } ?>
 
+<?php if (!empty($detail->results)) { ?>
 <div class="table-responsive">
     <table class="table table-condensed">
         <thead>
@@ -131,6 +131,6 @@
 document.getElementById('main').style.width = '100%';
 </script>
 <?php } else { ?>
-    <div>報酬はありません</div>
+  <div class="alert alert-warning" role="alert">指定された期間の報酬はありません。</div>
 <?php } ?>
 
