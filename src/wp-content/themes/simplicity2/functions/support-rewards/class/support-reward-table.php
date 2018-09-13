@@ -11,10 +11,10 @@ class supportRewardTable  extends WP_List_Table {
     {
         $this->date = empty($_GET['search_date']) ? null : $_GET['search_date'];
         $this->isOnlyWithdrawal = $_GET['is_only_withdrawal'] === 'ON';
-		
+
         parent::__construct([
-			'plural' => 'support-rewards',
-			'screen' => isset( $args['screen'] ) ? $args['screen'] : null,
+            'plural' => 'support-rewards',
+            'screen' => isset( $args['screen'] ) ? $args['screen'] : null,
         ]);
     }
 
@@ -53,7 +53,7 @@ class supportRewardTable  extends WP_List_Table {
                 $this->date, 
                 $this->isOnlyWithdrawal
             );
-			
+
             foreach ($rewards as $reward) {
                 $this->items[] = $reward->toArray();
             }
@@ -61,14 +61,14 @@ class supportRewardTable  extends WP_List_Table {
     }
 	
 	public function getCsvItems() {
-		$resultCsvItems = [];
-		
-		foreach ($this->items as $item) {
-			$itemValues = array_values($item);
-			$resultCsvItems[] = implode($itemValues, ',');
-		}
-		
-		return $resultCsvItems;
+        $resultCsvItems = [];
+
+        foreach ($this->items as $item) {
+            $itemValues = array_values($item);
+            $resultCsvItems[] = implode($itemValues, ',');
+        }
+
+        return $resultCsvItems;
 	}
     
     public function toCsvArray()
