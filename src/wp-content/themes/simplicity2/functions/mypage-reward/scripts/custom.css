@@ -1,0 +1,33 @@
+/*
+.table {
+    table-layout:fixed;
+}
+    */
+
+.table thead th {
+    /*width:200px;*/
+    white-space: nowrap;
+}
+
+/* スクロールバーを常に表示させる */
+.table-responsive {
+    overflow-x: auto;
+}
+.table-responsive::-webkit-scrollbar {
+    height: 5px;
+}
+.table-responsive::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background: #eee;
+}
+.table-responsive::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: #666;
+}
+
+/* 表示期間のフォント調整 */
+@media screen and (max-width: 480px) {
+    .form-control {
+        font-size: 0.7rem;
+    }
+}

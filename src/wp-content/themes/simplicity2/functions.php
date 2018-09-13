@@ -1,4 +1,13 @@
 <?php
+// 予約システム改修用php
+require_once('functions/mts-support/mts-function.php');
+// 会員自動登録
+require_once('functions/auto-registration/class/auto-registration.php');
+// 報酬確認ページ
+require_once('functions/support-rewards/support-reward-function.php');
+// マイページの報酬確認
+require_once('functions/mypage-reward/function.php');
+
 require_once(ABSPATH . 'wp-admin/includes/file.php');//WP_Filesystemの使用
 include 'lib/php-html-css-js-minifier.php'; //縮小化ライブラリ
 include 'lib/customizer.php';//テーマカスタマイザー関係の関数
@@ -1305,7 +1314,7 @@ add_action('admin_menu', 'remove_menus');
 function remove_admin_bar_menu( $wp_admin_bar ) {
  $wp_admin_bar->remove_menu( 'wp-logo' ); // WordPressシンボルマーク
  $wp_admin_bar->remove_menu('my-account'); // マイアカウント
-   
+
  }
 add_action( 'admin_bar_menu', 'remove_admin_bar_menu', 70 );
 
