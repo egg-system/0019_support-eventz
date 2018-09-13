@@ -10,9 +10,6 @@ class SupportReward {
 
     public function __get($name)
     {
-        var_dump($this->attribute);
-        exit;
-
         if (array_key_exists($name, $this->attribute)) {
             return $this->attribute[$name];
         }
@@ -30,64 +27,58 @@ class SupportReward {
         return $this->attribute;
     }
 
-    public static function getRewards($startMonth, $endMonth)
+    public static function getRewards($date, $isOnlyWithdrawal)
     {
         global $wpdb;
-        $members = $wpdb->get_results(self::getMembersSql(), 'ARRAY_A');
-        $rewards = $wpdb->get_results(self::getRewardsSql($startMonth, $endMonth), 'ARRAY_A');
+        $sql = 'SELECT 
+            member_table.member_id,
+            concat(
+                member_table.first_name, 
+                member_table.last_name
+            ) AS member_name,
+            wp9_reward_details.introducer_id,
+            concat(
+                introducer_table.first_name, 
+                introducer_table.last_name
+            ) AS introducer_name,
+            `date`,
+            wp9_swpm_membership_tbl.alias AS introducer_category,
+            price
+        FROM wp9_reward_details
+        LEFT JOIN wp9_swpm_members_tbl AS member_table
+        ON wp9_reward_details.member_id = member_table.member_id
+        LEFT JOIN wp9_swpm_members_tbl AS introducer_table
+        ON wp9_reward_details.introducer_id = introducer_table.member_id
+        LEFT JOIN wp9_swpm_membership_tbl
+        ON wp9_reward_details.level = wp9_swpm_membership_tbl.id';
 
-        $results = null;
-        foreach ($members as $member) {
-            $memberId = $member['id'];
-            $reward = self::getMemberReward($memberId, $rewards);
-
-            $memberWithReqard = array_merge($member, $reward);
-            $results[$memberId] = new self($memberWithReqard);
+        $whereSql = self::getWhereSql($date, $isOnlyWithdrawal);
+        if (isset($whereSql)) {
+            $sql = "{$sql}\n WHERE {$whereSql}";
         }
 
-        return $results;
-    }
+        $sql = "{$sql}\n ORDER BY `date` DESC";
+        $rewards = $wpdb->get_results($sql, 'ARRAY_A');
 
-    private static function getMembersSql()
-    {
-        return "SELECT 
-                    wp9_swpm_members_tbl.member_id as id,
-                    concat(
-                        wp9_swpm_members_tbl.first_name, 
-                        wp9_swpm_members_tbl.last_name
-                    ) as member_name,
-                    wp9_swpm_members_tbl.member_since as member_created_at,
-                    wp9_swpm_members_tbl.subscription_starts as member_category_chage,
-                    wp9_swpm_membership_tbl.alias as member_category
-                FROM wp9_swpm_members_tbl
-                LEFT JOIN wp9_swpm_membership_tbl
-                ON wp9_swpm_members_tbl.membership_level = wp9_swpm_membership_tbl.id
-                ORDER BY id DESC";
-    }
-
-    private static function getRewardsSql($startMonth, $endMonth)
-    {
-        return "SELECT 
-                    member_id,
-                    DATE_FORMAT(`date`, '%Y-%m') as `month`,
-                    SUM(price) as month_reward
-                FROM wp9_reward_details
-                WHERE `date` between '{$startMonth->format('Y-m-d')}' 
-                    AND '{$endMonth->format('Y-m-d')}' 
-                GROUP BY member_id, `month`";
-    }
-
-    private static function getMemberReward($memberId, $rewards)
-    {
-        $resultReward = [];
+        $resultRewards = [];
         foreach ($rewards as $reward) {
-            if ($reward['member_id'] !== $memberId) {
-                continue;
-            }
-
-            $resultReward[$reward['month']] = $reward['month_reward'];
+            $resultRewards[] = new self($reward);
         }
 
-        return $resultReward;
+        return $resultRewards;
+    }
+
+    private static function getWhereSql($date, $isOnlyWithdrawal)
+    {
+        $whereSql = [];
+        if (isset($date)) {
+            $whereSql[] = "`date` LIKE '{$date}%'";
+        }
+
+        if ($isOnlyWithdrawal) {
+            $whereSql[] = "introducer_id IS NULL";
+        }
+		
+        return empty($whereSql) ? null : implode($whereSql, ' and ');
     }
 }
