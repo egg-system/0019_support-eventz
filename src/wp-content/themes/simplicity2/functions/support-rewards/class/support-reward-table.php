@@ -19,7 +19,7 @@ class supportRewardTable  extends WP_List_Table {
     }
 
 	protected function get_primary_column_name() {
-        return 'id';
+        return 'member_id';
     }
 
     public function get_columns()
@@ -75,9 +75,9 @@ class supportRewardTable  extends WP_List_Table {
     {
         $resultCsvArray = $this->getCsvItems();
 		
-		$header = implode($this->get_columns(), ',');
+        $header = implode($this->get_columns(), ',');
         array_unshift($resultArray, $header);
 		
-		return $resultCsvArray;
+        return $resultCsvArray;
     }
 }
