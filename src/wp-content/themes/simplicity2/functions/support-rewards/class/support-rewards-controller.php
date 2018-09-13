@@ -24,7 +24,7 @@ class SupportRewardsController {
 	
 	public function export() {
         $this->rewardTable->prepare_items();
-		
+
         $date = date('ymdHis');
         $fileName = "{$date}_reward.csv";
 

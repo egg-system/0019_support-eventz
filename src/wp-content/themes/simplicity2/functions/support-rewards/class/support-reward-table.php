@@ -74,10 +74,10 @@ class supportRewardTable  extends WP_List_Table {
     public function toCsvArray()
     {
         $resultCsvArray = $this->getCsvItems();
-		
+
         $header = implode($this->get_columns(), ',');
         array_unshift($resultArray, $header);
-		
+
         return $resultCsvArray;
     }
 }
