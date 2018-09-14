@@ -190,7 +190,7 @@ class Detail
     private function getSelectTerm()
     {
         // TODO:仮で決め
-        $start = "201701";
+        $start = "201801";
         $end = date("Ym");
         // 1日を足して必ず1日にする
         $endDay = $end . "01";
@@ -200,9 +200,9 @@ class Detail
         $i = 0;
         $month = null;
         while ($month !== $start) {
-            $i++;
             $month = date("Ym", strtotime("${endDay} -${i} month"));
             $allMonth[] = $month;
+            $i++;
         }
 
         return $allMonth;
