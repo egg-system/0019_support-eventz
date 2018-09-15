@@ -21,8 +21,8 @@ class AutoRegistration {
      * @return void
      */
      public function after_registration($form_data){
-       $member_level = $form_data['membership_level'];
-       if (in_array(intval($member_level), Constant::MEMBER_LEVEL_ARY, true)) {
+         $member_level = $form_data['membership_level'];
+         if (in_array(intval($member_level), Constant::MEMBER_LEVEL_ARY, true)) {
           $email = $form_data['email'];
           $tel = $form_data['phone'];
           $money = $this->_getMemberFee($member_level);
@@ -55,27 +55,33 @@ class AutoRegistration {
          if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && isset($_GET['money']) && $_GET['rel'] == 'yes') {
            $email = $_GET['email'];
            $fee = $_GET['money'];
-           $level = $this->_getMemberLevel($fee);
+           $member_info = $this->_getMember($email);
+           if (!array_key_exists('level', $member_info)) {
+            　return;
+           }
+
+           $level = $member_info['level'];
+           $membership_level = $this->_getMemberLevel($level);
            // 会員レベルの取得が出来ていない場合処理なし
-           if (is_null($level)) {
-             echo('会員レベルの取得に失敗しました');
-             return;
+           if (is_null($membership_level)) {
+              echo('会員レベルの取得に失敗しました');
+              return;
            }
 
            // フォームにて入力された分のレコードの更新
            $member_table = $this->tablePrefix."swpm_members_tbl";
-           $upd_result = $this->wpdb->update($member_table, array('membership_level' => $level), array('email' => $_GET['email']));
+           $upd_result = $this->wpdb->update($member_table, array('membership_level' => $membership_level), array('email' => $_GET['email']));
            if (false === $upd_result) {
-             echo('updateでエラーが発生しました');
-             return;
+              echo('updateでエラーが発生しました');
+              return;
            }
 
            $ins_result = $this->_insertIntroducedReward($email);
            if (false === $ins_result) {
-             echo('updateでエラーが発生しました');
-             return;
+              echo('updateでエラーが発生しました');
+              return;
            }
-
+           error_log(print_r("bbbb", true)."\n", 3, "/tmp/auto-registration.log");
            $this->_sendInitPaymentMail($email);
            echo('決済認証成功');
          } else {
@@ -91,14 +97,18 @@ class AutoRegistration {
      */
     public function _sendInitPaymentMail($email) {
         // 件名
-        $subject = "【サポートカフェ】会員登録完了";
+        $subject = "【サポートイベント】会員登録完了";
         // 本文
-        $message = "サポートカフェ事務局です。<br><br>会員登録が全て完了いたしました。<br>
-                 <br>今後ともサポートカフェをよろしくお願いいたします。<br>
-                 <br>株式会社 トレイス<br>
-                 <br>MAIL:cafesuppo@gmail.com<br>";
+        $message = "サポートイベント運営事務局です。<br>
+                 <br>会員登録が全て完了いたしました。<br>
+                 <br>マイページのご利用が可能となります。
+                 <br>[https://support.eventz.jp/membership-login/membership-profile]<br>
+                 <br>今後ともサポートイベントをよろしくお願いいたします。<br>
+                 <br>---
+                 <br>サポートイベント運営事務局
+                 <br>cafesuppo@gmail.com<br>";
         // ヘッダー
-        $headers = ['From: サポートカフェ <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
+        $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
         wp_mail($email, $subject, $message, $headers);
     }
 
@@ -112,13 +122,15 @@ class AutoRegistration {
         //IPアドレスでテレコムからのアクセスであることを確認
         $is_telecom_access = $this->_isTelecomIpAccessed();
         if (!$is_telecom_access) {
-            echo('不正なアクセスです。');
-            return;
+          echo('不正なアクセスです。');
+          return;
         }
 
         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no') {
+            $email = $_GET['email'];
+            $unpaid_member_level = $this->_getUnpaidMemberLevel($email);
             $member_table = $this->tablePrefix."swpm_members_tbl";
-            $upd_result = $this->wpdb->update($member_table, array('membership_level' => Constant::UNPAID_MEMBER_LEVEL), array('email' => $_GET['email']));
+            $upd_result = $this->wpdb->update($member_table, array('membership_level' => $unpaid_member_level), array('email' => $_GET['email']));
             if (false === $upd_result) {
               echo('updateでエラーが発生しました。');
               return;
@@ -167,9 +179,25 @@ class AutoRegistration {
      *
      * @return int
      */
-    private function _getMemberLevel($fee) {
-        if ($fee == Constant::PREMIUM_MEMBER_FEE) return Constant::PREMIUM_MEMBER_LEVEL;
-        if ($fee == Constant::PREMIUM_AGENCY_FEE) return Constant::PREMIUM_AGENCY_LEVEL;
+    private function _getMemberLevel($memberLevel) {
+        if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_LEVEL;
+        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_LEVEL;
+        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL;
+        return null;
+    }
+
+    /**
+     * 決済未済会員レベル取得
+     *
+     * @return int
+     */
+    private function _getUnpaidMemberLevel($email) {
+        $member_info = $this->_getMember($email);
+        $level = $member_info['level'];
+
+        if ($level == Constant::PREMIUM_MEMBER_LEVEL) return Constant::UNPAID_PREMIUM_MEMBER;
+        if ($level == Constant::PREMIUM_AGENCY_LEVEL) return Constant::UNPAID_PREMIUM_AGENCY;
+        if ($level == Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL) return Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER;
         return null;
     }
 
@@ -191,10 +219,10 @@ class AutoRegistration {
         $rewardTable = $this->tablePrefix."reward_details";
         $data = ['member_id' => $member['member_id'],
                  'introducer_id' => $member['introducer_id'],
-                 'date' => CURRENT_TIMESTAMP(),
+                 'date' => current_time('mysql', 1),
                  'level' => $member['level'],
                  'price' => $rewardPrice
-               ];
+                 ];
         $format = ['%d',
                    '%d',
                    '%s',
@@ -210,8 +238,9 @@ class AutoRegistration {
         case Constant::PREMIUM_MEMBER_LEVEL:
           return Constant::PREMIUM_MEMBER_INTRODUCE_FEE;
         case Constant::PREMIUM_AGENCY_LEVEL:
+          return Constant::PREMIUM_AGENCY_FEE;
         case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL:
-          return Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL;
+          return Constant::PREMIUM_AGENCY_ORGANIZER_FEE;
         default:
           return null;
         }
