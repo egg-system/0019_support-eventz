@@ -76,7 +76,7 @@ class SupportReward {
         }
 
         if ($isOnlyWithdrawal) {
-            $whereSql[] = "introducer_id IS NULL";
+            $whereSql[] = "price < 0";
         }
 		
         return empty($whereSql) ? null : implode($whereSql, ' and ');

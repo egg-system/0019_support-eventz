@@ -3,7 +3,7 @@
   <form 
     id="reward-form"
     method="GET"
-    action="http://sample004.eggsystem.co.jp/wp-admin/admin.php?"
+    action="<?php echo admin_url() ?>"
   >
     <div class="form-input">
       <div>
@@ -34,7 +34,7 @@
     </div>
     <div id="support-reward-buttons">
       <input type="submit" value="検索"/>
-      <a href="http://sample004.eggsystem.co.jp/wp-admin/admin.php?page=support-reward&content-type=csv">
+      <a href="<?php echo admin_url(). '?page=support-reward&content-type=csv' ?>">
         csvダウンロード
       </a>
     </div>
