@@ -17,6 +17,7 @@ class Constant
   const UNPAID_PREMIUM_AGENCY = 6;
   // プレミアム代理店会員＆主催（決済未済）
   const UNPAID_PREMIUM_AGENCY_ORGANIZER = 7;
+
   // プレミアム会員
   const PREMIUM_MEMBER_LEVEL = 8;
   // プレミアム代理店会員
@@ -26,6 +27,7 @@ class Constant
   // 会員レベルの配列
   const MEMBER_LEVEL_ARY = array(self::UNPAID_PREMIUM_MEMBER, self::UNPAID_PREMIUM_AGENCY, self::UNPAID_PREMIUM_AGENCY_ORGANIZER);
 
+  // 会員費
   // プレミアム会員
   const PREMIUM_MEMBER_FEE = 5000;
   // プレミアム代理店会員
@@ -33,6 +35,7 @@ class Constant
   // プレミアム代理店会員＆主催
   const PREMIUM_AGENCY_ORGANIZER_FEE = 8000;
 
+  // 報酬
   // プレミアム会員紹介報酬
   const PREMIUM_MEMBER_INTRODUCE_FEE = 2000;
   // プレミアム代理店会員紹介報酬
