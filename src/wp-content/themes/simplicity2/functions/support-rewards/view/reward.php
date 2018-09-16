@@ -7,9 +7,9 @@
   >
     <div class="form-input">
       <div>
-        <label for="search_date">年月日</label>
+        <label for="search_date">年月</label>
         <input 
-          type="date"
+          type="month"
           name="search_date"
           value="<?php echo $_GET['search_date'] ?>"
         />
