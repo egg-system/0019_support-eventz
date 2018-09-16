@@ -20,27 +20,32 @@ class AutoRegistration {
      *
      * @return void
      */
-     public function after_registration($form_data){
+    public function after_registration($form_data){
+         // 未決済会員レベル
          $member_level = $form_data['membership_level'];
-         if (in_array(intval($member_level), Constant::MEMBER_LEVEL_ARY, true)) {
-          $email = $form_data['email'];
-          $tel = $form_data['phone'];
-          $money = $this->_getMemberFee($member_level);
-          // パラメーターの取得が出来ていない場合処理なし
-          if (empty($email) || empty($tel) || is_null($money)) {
-            return;
-          }
+         // 紹介者ID
+         $introducer_id = $form_data['company_name'];
+         // 入力した紹介者IDが登録されているか確認
+         $is_introducer_id = $this->_isExistIntroducer($introducer_id);
+         if (in_array(intval($member_level), Constant::MEMBER_LEVEL_ARY, true) && $is_introducer_id) {
+            $email = $form_data['email'];
+            $tel = $form_data['phone'];
+            $money = $this->_getMemberFee($member_level);
+            // パラメーターの取得が出来ていない場合処理なし
+            if (empty($email) || empty($tel) || is_null($money)) {
+                return;
+            }
 
-          $redirectUrl = site_url().Constant::REDIRECT_URL;
-          // $client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
-          $client_ip = (site_url() == Constant::SITE_URL) ? Constant::TEST_CLIENT_IP : Constant::PRODUCT_CLIENT_IP; // テスト用
+            $redirectUrl = site_url().Constant::REDIRECT_URL;
+            // $client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
+            $client_ip = (site_url() == Constant::SITE_URL) ? Constant::TEST_CLIENT_IP : Constant::PRODUCT_CLIENT_IP; // テスト用
 
-          // $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$money}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
-          $testPaymentUrl = Constant::TEST_URL.$client_ip."&money={$money}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            // $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$money}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            $testPaymentUrl = Constant::TEST_URL.$client_ip."&money={$money}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
 
-          header("Location: {$testPaymentUrl}");
-          exit;
-       }
+            header("Location: {$testPaymentUrl}");
+            exit;
+        }
      }
 
 
@@ -55,13 +60,15 @@ class AutoRegistration {
          if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && isset($_GET['money']) && $_GET['rel'] == 'yes') {
            $email = $_GET['email'];
            $fee = $_GET['money'];
-           $member_info = $this->_getMember($email);
-           if (!array_key_exists('level', $member_info)) {
-            　return;
-           }
 
-           $level = $member_info['level'];
-           $membership_level = $this->_getMemberLevel($level);
+           // 会員取得
+           $member_info = $this->_getMember($email);
+           error_log(print_r($member_info, true)."\n", 3, "/tmp/auto-registration.log");
+           if (!array_key_exists('introducer_id', $member_info) || is_null($member_info['introducer_id'])) {
+              return;
+           }
+           // 会員レベルの取得
+           $membership_level = $this->_getMemberLevel($member_info['level']);
            // 会員レベルの取得が出来ていない場合処理なし
            if (is_null($membership_level)) {
               echo('会員レベルの取得に失敗しました');
@@ -81,7 +88,7 @@ class AutoRegistration {
               echo('updateでエラーが発生しました');
               return;
            }
-           error_log(print_r("bbbb", true)."\n", 3, "/tmp/auto-registration.log");
+
            $this->_sendInitPaymentMail($email);
            echo('決済認証成功');
          } else {
@@ -135,7 +142,6 @@ class AutoRegistration {
               echo('updateでエラーが発生しました。');
               return;
             }
-
             echo('継続決済失敗データを受信しました。');
             return;
         }
@@ -167,10 +173,11 @@ class AutoRegistration {
      *
      * @return int
      */
-    private function _getMemberFee($member_level) {
-        if ($member_level == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_FEE;
-        if ($member_level == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_FEE;
-        if ($member_level == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE;
+    private function _getMemberFee($memberLevel) {
+        // 5,6,7のいずれかの場合、5000,8000,8000
+        if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_FEE;
+        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_FEE;
+        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE;
         return null;
     }
 
@@ -180,6 +187,7 @@ class AutoRegistration {
      * @return int
      */
     private function _getMemberLevel($memberLevel) {
+        // 5,6,7のいずれかの場合、8,9,10
         if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_LEVEL;
         if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_LEVEL;
         if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL;
@@ -195,17 +203,29 @@ class AutoRegistration {
         $member_info = $this->_getMember($email);
         $level = $member_info['level'];
 
-        if ($level == Constant::PREMIUM_MEMBER_LEVEL) return Constant::UNPAID_PREMIUM_MEMBER;
-        if ($level == Constant::PREMIUM_AGENCY_LEVEL) return Constant::UNPAID_PREMIUM_AGENCY;
-        if ($level == Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL) return Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER;
-        return null;
+        switch ($level) {
+        case Constant::PREMIUM_MEMBER_LEVEL:
+            return Constant::UNPAID_PREMIUM_MEMBER;
+        case Constant::PREMIUM_AGENCY_LEVEL:
+            return Constant::UNPAID_PREMIUM_AGENCY;
+        case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL:
+            return Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER;
+        default:
+            return null;
+        }
     }
 
+
+    /**
+     * 紹介報酬Insert
+     *
+     * @rrturn int
+     */
     function _insertIntroducedReward($email) {
         $member = $this->_getMember($email);
 
         // 紹介者IDが取得できない場合、
-        if (!array_key_exists('introducer_id', $member) && is_null($member['introducer_id'])) {
+        if (!array_key_exists('introducer_id', $member) || is_null($member['introducer_id'])) {
           return;
         }
 
@@ -217,8 +237,10 @@ class AutoRegistration {
 
         // 必要なテーブルの定義
         $rewardTable = $this->tablePrefix."reward_details";
-        $data = ['member_id' => $member['member_id'],
-                 'introducer_id' => $member['introducer_id'],
+        // 報酬詳細テーブルはmember_idとintroducer_idが逆となる
+        // 例)456さんが123さんを紹介した場合：member_id:456、introducer_id:123
+        $data = ['member_id' => $member['introducer_id'],
+                 'introducer_id' => $member['member_id'],
                  'date' => current_time('mysql', 1),
                  'level' => $member['level'],
                  'price' => $rewardPrice
@@ -233,6 +255,11 @@ class AutoRegistration {
         return $results;
     }
 
+    /**
+     * 報酬金額取得
+     *
+     * @return int
+     */
     private function _getRewardPrice($level) {
       switch ($level) {
         case Constant::PREMIUM_MEMBER_LEVEL:
@@ -246,6 +273,11 @@ class AutoRegistration {
         }
     }
 
+    /**
+     * 会員取得
+     *
+     * @return Array
+     */
     private function _getMember($email) {
       $memberTable = $this->tablePrefix."swpm_members_tbl";
 
@@ -259,6 +291,27 @@ class AutoRegistration {
         ON {$memberTable}.company_name = introducerTable.member_id
         WHERE {$memberTable}.email = '{$email}'
         ", 'ARRAY_A');
+    }
+
+    /**
+     * 紹介者IDの存在チェック
+     *
+     * @return boolean
+     */
+    private function _isExistIntroducer($company_name) {
+        $memberTable = $this->tablePrefix."swpm_members_tbl";
+
+        $member_id_ary = $this->wpdb->get_row("
+            SELECT
+            {$memberTable}.member_id
+            FROM {$memberTable}
+            WHERE {$memberTable}.member_id = '{$company_name}'", 'ARRAY_A');
+
+        if(!array_key_exists('member_id', $member_id_ary) || is_null($member_id_ary['member_id'])) {
+            return false;
+        }
+
+        return true;
     }
 
 } // end of class

@@ -17,6 +17,7 @@ class Constant
   const UNPAID_PREMIUM_AGENCY = 6;
   // プレミアム代理店会員＆主催（決済未済）
   const UNPAID_PREMIUM_AGENCY_ORGANIZER = 7;
+  
   // プレミアム会員
   const PREMIUM_MEMBER_LEVEL = 8;
   // プレミアム代理店会員
