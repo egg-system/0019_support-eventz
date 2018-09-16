@@ -24,15 +24,15 @@ class SupportRewardsController {
 	
 	public function export() {
         $this->rewardTable->prepare_items();
-
+		
         $date = date('ymdHis');
         $fileName = "{$date}_reward.csv";
-
-        header('Content-Type: text/csv');
-        header("Content-Disposition: attachment; filename={$fileName}");
-
-        $csvContent = implode($this->rewardTable->toCsvArray(), "\n");
-        echo mb_convert_encoding($csvContent, "SJIS", "UTF-8");
-        exit();
+		
+		header('Content-Type: text/csv');
+		header("Content-Disposition: attachment; filename={$fileName}");
+        
+		$csvContent = implode($this->rewardTable->toCsvArray(), "\n");
+		echo mb_convert_encoding($csvContent, "SJIS", "UTF-8");
+		exit();
     }
 }

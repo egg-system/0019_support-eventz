@@ -23,7 +23,7 @@ class AutoRegistration {
     public function after_registration($form_data){
          // 未決済会員レベル
          $member_level = $form_data['membership_level'];
-         // 紹介者ID
+         // 紹介者ID 
          $introducer_id = $form_data['company_name'];
          // 入力した紹介者IDが登録されているか確認
          $is_introducer_id = $this->_isExistIntroducer($introducer_id);
@@ -40,10 +40,10 @@ class AutoRegistration {
             // $client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
             $client_ip = (site_url() == Constant::SITE_URL) ? Constant::TEST_CLIENT_IP : Constant::PRODUCT_CLIENT_IP; // テスト用
 
-            $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$money}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
-            // $testPaymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$money}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            // $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$money}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            $testPaymentUrl = Constant::TEST_URL.$client_ip."&money={$money}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
 
-            header("Location: {$paymentUrl}");
+            header("Location: {$testPaymentUrl}");
             exit;
          } else {
             $this->_deleteIncorrectUser($form_data['email']);
@@ -106,6 +106,7 @@ class AutoRegistration {
      * @return void
      */
      public function _sendInitPaymentMail($email, $member_info) {
+error_log(print_r($member_info, true)."\n", 3, "/tmp/auto-registration.log");
         // 件名
         $subject = "【サポートイベント】会員登録完了";
         // 共通
@@ -134,8 +135,9 @@ class AutoRegistration {
                  <br>---
                  <br>サポートイベント運営事務局(https://support.eventz.jp)
                  <br>cafesuppo@gmail.com<br>";
-
+error_log(print_r("sssss", true)."\n", 3, "/tmp/auto-registration.log");
         $message = $common_msg . $each_member_msg . $footer_msg;
+error_log(print_r($message, true)."\n", 3, "/tmp/auto-registration.log");
         // ヘッダー
         $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
         wp_mail($email, $subject, $message, $headers);
@@ -143,7 +145,7 @@ class AutoRegistration {
 
     /**
      * 会員レベル毎に、会員登録完了メールに表示する内容を変更
-     *
+     * 
      * @return String
      */
     private function _getCompMailContents($member_info) {
@@ -179,7 +181,16 @@ class AutoRegistration {
           return;
         }
 
+        $rl = $_GET['rel'];
+error_log(print_r("-------", true)."\n", 3, "/tmp/auto-registration.log");
+error_log(print_r($_SERVER["REMOTE_ADDR"], true)."\n", 3, "/tmp/auto-registration.log");
+error_log(print_r(date("Y-m-d H:i:s"), true)."\n", 3, "/tmp/auto-registration.log");
+error_log(print_r($_GET['email'], true)."\n", 3, "/tmp/auto-registration.log");
+error_log(print_r($rl, true)."\n", 3, "/tmp/auto-registration.log");
+error_log(print_r("continue01", true)."\n", 3, "/tmp/auto-registration.log");
         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no') {
+error_log(print_r(date("Y-m-d H:i:s"), true)."\n", 3, "/tmp/auto-registration.log");
+error_log(print_r("continue02", true)."\n", 3, "/tmp/auto-registration.log");
             $email = $_GET['email'];
             // 会員取得
             $member_info = $this->_getMember($email);
@@ -188,13 +199,15 @@ class AutoRegistration {
             }
             // 未決済会員レベル取得
             $unpaid_member_level = $this->_getUnpaidMemberLevel($member_info['level']);
+error_log(print_r($unpaid_member_level, true)."\n", 3, "/tmp/auto-registration.log");
             $member_table = $this->tablePrefix."swpm_members_tbl";
             $upd_result = $this->wpdb->update($member_table, array('membership_level' => $unpaid_member_level), array('email' => $_GET['email']));
             if (false === $upd_result) {
               echo('updateでエラーが発生しました。');
               return;
             }
-
+error_log(print_r(date("Y-m-d H:i:s"), true)."\n", 3, "/tmp/auto-registration.log");
+error_log(print_r("continue03", true)."\n", 3, "/tmp/auto-registration.log");
             echo('継続決済失敗データを受信しました。');
             return;
         }
@@ -302,10 +315,10 @@ class AutoRegistration {
 
         return $results;
     }
-
+    
     /**
      * 報酬金額取得
-     *
+     * 
      * @return int
      */
     private function _getRewardPrice($level) {
@@ -323,7 +336,7 @@ class AutoRegistration {
 
     /**
      * 会員取得
-     *
+     * 
      * @return Array
      */
     private function _getMember($email) {
@@ -366,16 +379,11 @@ class AutoRegistration {
         return true;
     }
 
-    /**
-     *  存在しない紹介者IDを入力して登録したユーザーの削除
-     *
-     * @return void
-     */
     private function _deleteIncorrectUser($email) {
         $table = $this->tablePrefix."swpm_members_tbl";
         $this->wpdb->delete( $table, array('email' => $email), array('%s'));
     }
-
+    
 } // end of class
 
 ?>
