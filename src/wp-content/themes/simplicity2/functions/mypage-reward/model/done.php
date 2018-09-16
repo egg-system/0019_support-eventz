@@ -62,6 +62,12 @@ class Done
      */
     private function insertOutput($membersId, $price)
     {
+        // 未設定の場合はエラー
+        if ($price === null || $price === '') {
+            $this->error = "出金金額を入力して下さい。";
+            return false;
+        }
+
         // 出金データの登録
         $result = $this->dao->insertOutput($membersId, -$price);
 
