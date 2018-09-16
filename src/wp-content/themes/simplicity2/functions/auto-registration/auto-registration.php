@@ -46,8 +46,8 @@ class AutoRegistration {
             header("Location: {$paymentUrl}");
             exit;
          } else {
+            // 会員登録失敗の会員を削除
             $this->_deleteIncorrectUser($form_data['email']);
-            echo("会員登録に失敗しました。再度登録をして下さい。");
          }
      }
 
@@ -73,7 +73,6 @@ class AutoRegistration {
            $membership_level = $this->_getMemberLevel($member_info['level']);
            // 会員レベルの取得が出来ていない場合処理なし
            if (is_null($membership_level)) {
-              echo('会員レベルの取得に失敗しました');
               return;
            }
 
@@ -81,13 +80,11 @@ class AutoRegistration {
            $member_table = $this->tablePrefix."swpm_members_tbl";
            $upd_result = $this->wpdb->update($member_table, array('membership_level' => $membership_level), array('email' => $_GET['email']));
            if (false === $upd_result) {
-              echo('updateでエラーが発生しました');
               return;
            }
 
            $ins_result = $this->_insertIntroducedReward($email);
            if (false === $ins_result) {
-              echo('updateでエラーが発生しました');
               return;
            }
 
@@ -177,6 +174,7 @@ class AutoRegistration {
           return;
         }
 
+        // 継続決済失敗時の処理
         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no') {
             $email = $_GET['email'];
             // 会員取得
@@ -186,25 +184,24 @@ class AutoRegistration {
             }
             // 未決済会員レベル取得
             $unpaid_member_level = $this->_getUnpaidMemberLevel($member_info['level']);
+            // 会員レベルを未決済を戻す
             $member_table = $this->tablePrefix."swpm_members_tbl";
             $upd_result = $this->wpdb->update($member_table, array('membership_level' => $unpaid_member_level), array('email' => $_GET['email']));
             if (false === $upd_result) {
-              echo('updateでエラーが発生しました。');
               return;
             }
-            echo('継続決済失敗データを受信しました。');
+
             return;
         }
 
+        //  継続決済成功後、紹介者報酬登録へ
         if ($is_telecom_access && isset($_GET['email'])) {
             $email = $_GET['email'];
             $ins_result = $this->_insertIntroducedReward($email);
             if (false === $ins_result) {
-              echo('updateでエラーが発生しました');
               return;
             }
         }
-        echo('決済データを受信しました。');
     }
 
 
