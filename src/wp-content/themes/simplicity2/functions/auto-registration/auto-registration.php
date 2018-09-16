@@ -38,12 +38,12 @@ class AutoRegistration {
 
             $redirectUrl = site_url().Constant::REDIRECT_URL;
             // $client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
-            $client_ip = (site_url() == Constant::SITE_URL) ? Constant::TEST_CLIENT_IP : Constant::PRODUCT_CLIENT_IP; // テスト用
+            $client_ip = (site_url() == Constant::SITE_URL) ? Constant::TEST_CLIENT_IP : Constant::PRODUCT_CLIENT_IP;
 
-            // $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$money}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
-            $testPaymentUrl = Constant::TEST_URL.$client_ip."&money={$money}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$money}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            // $testPaymentUrl = Constant::TEST_URL.$client_ip."&money={$money}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
 
-            header("Location: {$testPaymentUrl}");
+            header("Location: {$paymentUrl}");
             exit;
          } else {
             $this->_deleteIncorrectUser($form_data['email']);
@@ -177,7 +177,6 @@ class AutoRegistration {
           return;
         }
 
-        $rl = $_GET['rel'];
         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no') {
             $email = $_GET['email'];
             // 会員取得
