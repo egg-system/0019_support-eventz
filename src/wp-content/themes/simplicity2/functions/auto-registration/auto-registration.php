@@ -23,7 +23,7 @@ class AutoRegistration {
     public function after_registration($form_data){
          // 未決済会員レベル
          $member_level = $form_data['membership_level'];
-         // 紹介者ID 
+         // 紹介者ID
          $introducer_id = $form_data['company_name'];
          // 入力した紹介者IDが登録されているか確認
          $is_introducer_id = $this->_isExistIntroducer($introducer_id);
@@ -40,8 +40,10 @@ class AutoRegistration {
             // $client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
             $client_ip = (site_url() == Constant::SITE_URL) ? Constant::PRODUCT_CLIENT_IP : Constant::TEST_CLIENT_IP;
 
-            $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$money}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
-            // $testPaymentUrl = Constant::TEST_URL.$client_ip."&money={$money}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            // プレミアム代理店主催の場合、moneyパラメーターへ指定する金額が変化する
+            $fee = ($member_level == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) ? Constant::PREMIUM_AGENCY_ORGANIZER_URL_FEE : $money;
+            $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$fee}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            // $paymentUrl = Constant::TEST_URL.$client_ip."&money={$fee}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
 
             header("Location: {$paymentUrl}");
             exit;
@@ -138,7 +140,7 @@ class AutoRegistration {
 
     /**
      * 会員レベル毎に、会員登録完了メールに表示する内容を変更
-     * 
+     *
      * @return String
      */
     private function _getCompMailContents($member_info) {
@@ -296,10 +298,10 @@ class AutoRegistration {
 
         return $results;
     }
-    
+
     /**
      * 報酬金額取得
-     * 
+     *
      * @return int
      */
     private function _getRewardPrice($level) {
@@ -317,7 +319,7 @@ class AutoRegistration {
 
     /**
      * 会員取得
-     * 
+     *
      * @return Array
      */
     private function _getMember($email) {
@@ -364,7 +366,7 @@ class AutoRegistration {
         $table = $this->tablePrefix."swpm_members_tbl";
         $this->wpdb->delete( $table, array('email' => $email), array('%s'));
     }
-    
+
 } // end of class
 
 ?>

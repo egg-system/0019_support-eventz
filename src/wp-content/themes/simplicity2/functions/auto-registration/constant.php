@@ -33,6 +33,9 @@ class Constant
   // プレミアム代理店会員＆主催
   const PREMIUM_AGENCY_ORGANIZER_FEE = 8000;
 
+  // プレミアム代理店会員＆主催 初回決済時URLパラメーター指定金額
+  const PREMIUM_AGENCY_ORGANIZER_URL_FEE = 40400;
+
   // プレミアム会員紹介報酬
   const PREMIUM_MEMBER_INTRODUCE_FEE = 2000;
   // プレミアム代理店会員紹介報酬
@@ -48,7 +51,7 @@ class Constant
   // const TEST_SITE_URL = 'http://sample004.eggsystem.co.jp';
   const SITE_URL = 'https://support.eventz.jp';
   // サポートカフェ テレコムクレジット決済URL
-  const TELECOM_CREDIT_FORM_URL = 'https://secure.telecomcredit.co.jp/inetcredit/adult/order.pl?clientip=';
+  const TELECOM_CREDIT_FORM_URL = 'https://secure.telecomcredit.co.jp/inetcredit/secure/order.pl?clientip=';
   // テスト用(要コメントアウト)
   // const TEST_URL = 'https://secure.telecomcredit.co.jp/inetcredit/secure/order.pl?clientip=';
 }
