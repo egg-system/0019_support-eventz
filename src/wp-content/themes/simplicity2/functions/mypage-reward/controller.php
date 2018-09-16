@@ -7,21 +7,18 @@ include_once(__DIR__ . "/lib/dao.php");
 class Controller
 {
     // ワードプレスのグローバル変数
-    private $postId;
     private $wpdb;
     private $tablePrefix;
 
     /**
      * コンストラクタ
      *
-     * @param int paostId
      * @param object $wpdb
      * @param string $tablePrefix
      * @return void
      */
-    public function __construct($postId, $wpdb, $tablePrefix)
+    public function __construct($wpdb, $tablePrefix)
     {
-        $this->postId = $postId;
         $this->wpdb = $wpdb;
         $this->tablePrefix = $tablePrefix;
 
