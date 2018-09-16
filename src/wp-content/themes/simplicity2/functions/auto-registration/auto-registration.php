@@ -66,7 +66,6 @@ class AutoRegistration {
 
            // 会員取得
            $member_info = $this->_getMember($email);
-           error_log(print_r($member_info, true)."\n", 3, "/tmp/auto-registration.log");
            if (!array_key_exists('introducer_id', $member_info) || is_null($member_info['introducer_id'])) {
               return;
            }
@@ -106,7 +105,6 @@ class AutoRegistration {
      * @return void
      */
      public function _sendInitPaymentMail($email, $member_info) {
-error_log(print_r($member_info, true)."\n", 3, "/tmp/auto-registration.log");
         // 件名
         $subject = "【サポートイベント】会員登録完了";
         // 共通
@@ -135,9 +133,7 @@ error_log(print_r($member_info, true)."\n", 3, "/tmp/auto-registration.log");
                  <br>---
                  <br>サポートイベント運営事務局(https://support.eventz.jp)
                  <br>cafesuppo@gmail.com<br>";
-error_log(print_r("sssss", true)."\n", 3, "/tmp/auto-registration.log");
         $message = $common_msg . $each_member_msg . $footer_msg;
-error_log(print_r($message, true)."\n", 3, "/tmp/auto-registration.log");
         // ヘッダー
         $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
         wp_mail($email, $subject, $message, $headers);
@@ -182,15 +178,7 @@ error_log(print_r($message, true)."\n", 3, "/tmp/auto-registration.log");
         }
 
         $rl = $_GET['rel'];
-error_log(print_r("-------", true)."\n", 3, "/tmp/auto-registration.log");
-error_log(print_r($_SERVER["REMOTE_ADDR"], true)."\n", 3, "/tmp/auto-registration.log");
-error_log(print_r(date("Y-m-d H:i:s"), true)."\n", 3, "/tmp/auto-registration.log");
-error_log(print_r($_GET['email'], true)."\n", 3, "/tmp/auto-registration.log");
-error_log(print_r($rl, true)."\n", 3, "/tmp/auto-registration.log");
-error_log(print_r("continue01", true)."\n", 3, "/tmp/auto-registration.log");
         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no') {
-error_log(print_r(date("Y-m-d H:i:s"), true)."\n", 3, "/tmp/auto-registration.log");
-error_log(print_r("continue02", true)."\n", 3, "/tmp/auto-registration.log");
             $email = $_GET['email'];
             // 会員取得
             $member_info = $this->_getMember($email);
@@ -199,15 +187,12 @@ error_log(print_r("continue02", true)."\n", 3, "/tmp/auto-registration.log");
             }
             // 未決済会員レベル取得
             $unpaid_member_level = $this->_getUnpaidMemberLevel($member_info['level']);
-error_log(print_r($unpaid_member_level, true)."\n", 3, "/tmp/auto-registration.log");
             $member_table = $this->tablePrefix."swpm_members_tbl";
             $upd_result = $this->wpdb->update($member_table, array('membership_level' => $unpaid_member_level), array('email' => $_GET['email']));
             if (false === $upd_result) {
               echo('updateでエラーが発生しました。');
               return;
             }
-error_log(print_r(date("Y-m-d H:i:s"), true)."\n", 3, "/tmp/auto-registration.log");
-error_log(print_r("continue03", true)."\n", 3, "/tmp/auto-registration.log");
             echo('継続決済失敗データを受信しました。');
             return;
         }
