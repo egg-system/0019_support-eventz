@@ -30,7 +30,6 @@
                 <th>No</th>
                 <th>紹介者名</th>
                 <th>登録日</th>
-                <th>区分変更</th>
                 <th>会員レベル</th>
                 <?php foreach ($detail->allMonth as $month) { ?>
                     <th><?php echo $month; ?></th>
@@ -44,7 +43,6 @@
                     <td><?php echo $number; ?></td>
                     <td><?php echo $data[0]['first_name']; ?></td>
                     <td><?php echo $data[0]['date']; ?></td>
-                    <td></td>
                     <td><?php echo $data[0]['alias']; ?></td>
                     <?php foreach ($detail->allMonth as $month) { ?>
                         <td class="text-right"><?php echo isset($data[$month]['price']) ? '¥' . number_format($data[$month]['price']) : '¥0'; ?></td>
@@ -57,13 +55,11 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th></th>
                 <?php foreach ($detail->allMonth as $month) { ?>
                     <th></th>
                 <?php } ?>
             </tr>
             <tr>
-                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -81,7 +77,6 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td></td>
                 <td>出金申請額</td>
                 <?php foreach ($detail->allMonth as $month) { ?>
                     <?php $price = isset($detail->outputData[$month]) ? abs($detail->outputData[$month]) : 0; ?>
@@ -89,7 +84,6 @@
                 <?php } ?>
             </tr>
             <tr>
-                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
