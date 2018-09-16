@@ -1,19 +1,19 @@
 #reward-form {
-  display: flex;
-  flex-flow: column wrap;
+	display: flex;
+    flex-flow: column wrap;
 }
 
 #reward-form .form-input {
-  display: flex;
-  justify-content: space-around;
+	display: flex;
+	justify-content: space-around;
 }
 
 #reward-form input[type="submit"]{
-  width: 5em;
-  margin-right: 5em;
+	width: 5em;
+	margin-right: 5em;
 }
 
 #support-reward-buttons {
-  margin-left: 70%; 
+	margin-left: 70%;
 }
 

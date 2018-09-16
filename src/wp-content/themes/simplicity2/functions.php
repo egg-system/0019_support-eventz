@@ -2,7 +2,7 @@
 // 予約システム改修用php
 require_once('functions/mts-support/mts-function.php');
 // 会員自動登録
-require_once('functions/auto-registration/class/auto-registration.php');
+require_once('functions/auto-registration/function.php');
 // 報酬確認ページ
 require_once('functions/support-rewards/support-reward-function.php');
 // マイページの報酬確認
@@ -1314,7 +1314,7 @@ add_action('admin_menu', 'remove_menus');
 function remove_admin_bar_menu( $wp_admin_bar ) {
  $wp_admin_bar->remove_menu( 'wp-logo' ); // WordPressシンボルマーク
  $wp_admin_bar->remove_menu('my-account'); // マイアカウント
-
+   
  }
 add_action( 'admin_bar_menu', 'remove_admin_bar_menu', 70 );
 
@@ -1324,3 +1324,9 @@ function add_meta_query_vars( $public_query_vars ) {
     return $public_query_vars;
 }
 add_filter( 'query_vars', 'add_meta_query_vars' );
+
+add_filter('swpm_email_registration_complete_body', 'convert_nl');
+function convert_nl($message) {
+	return nl2br($message);
+}
+

@@ -34,8 +34,8 @@ class Dao
     {
         // 必要なテーブルの定義
         $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
-        $membersTable = $this->tablePrefix . "swpm_members_tbl";
-        $memberShipTable = $this->tablePrefix . "swpm_membership_tbl";
+        $membersTable = $this->tablePrefix . Constant::MEMBERS_TABLE;
+        $memberShipTable = $this->tablePrefix . Constant::MEMBERSHIP_TABLE;
         
         $bindSql = <<<SQL
 SELECT rd.id,
@@ -127,5 +127,29 @@ SQL;
         $results = $this->wpdb->insert($rewardDetailsTable, $data, $format);
 
         return $results;
+    }
+
+    /**
+     * ユーザー情報の取得
+     *
+     * @param int $membersId
+     * @return array $results
+     */
+    public function getMemberInfo($membersId)
+    {
+        // 必要なテーブルの定義
+        $membersTable = $this->tablePrefix . Constant::MEMBERS_TABLE;
+
+        $bindSql = <<<SQL
+SELECT 
+    first_name,
+    email
+FROM ${membersTable}
+WHERE member_id = %d
+SQL;
+        $sql = $this->wpdb->prepare($bindSql, $membersId);
+        $results = $this->wpdb->get_results($sql, ARRAY_A);
+
+        return $results[0];
     }
 }

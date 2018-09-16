@@ -35,4 +35,17 @@ function receive_telecom_result_continue_func() {
     $autoRegistration->receive_telecom_result_continue();
 }
 
+/**
+ * 完了メール送信
+ *
+ */
+//add_shortcode('send_complete_mail', 'send_complete_mail');
+//function send_complete_mail() {
+//    global $wpdb, $table_prefix;
+//    $autoRegistration = new AutoReg\AutoRegistration($wpdb, $table_prefix);
+//    $email = $_GET['email'];
+//    error_log(print_r($email, true)."\n", 3, "/tmp/auto-registration.log");
+//    $autoRegistration = _sendInitPaymentMail($email);
+//}
+
 ?>
