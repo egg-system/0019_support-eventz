@@ -28,7 +28,7 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>紹介者名</th>
+                <th>会員名</th>
                 <th>登録日</th>
                 <th>会員レベル</th>
                 <?php foreach ($detail->allMonth as $month) { ?>
