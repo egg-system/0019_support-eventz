@@ -42,17 +42,18 @@ class Constant
   const PREMIUM_AGENCY_INTRODUCE_FEE = 4000;
 
   const TEST_CLIENT_IP = '00286';
-  const PRODUCT_CLIENT_IP = '95518';
+  const PRODUCT_CLIENT_IP = '95543';
   // テレコムIPは下記固定で共通
   const TELECOM_IP_FROM_TO = array('52.196.8.0', '54.65.177.67', '54.95.89.20', '54.238.8.174');
   // リダイレクト先
   const REDIRECT_URL = "/register_complete";
   // サポートカフェサイトURL
-  const SITE_URL = 'http://sample004.eggsystem.co.jp';
+  // const SITE_URL = 'http://sample004.eggsystem.co.jp'; // テスト環境
+  const SITE_URL = 'https://support.eventz.jp';
   // サポートカフェ テレコムクレジット決済URL
   const TELECOM_CREDIT_FORM_URL = 'https://secure.telecomcredit.co.jp/inetcredit/adult/order.pl?clientip=';
   // テスト用(要コメントアウト)
-  const TEST_URL = 'https://secure.telecomcredit.co.jp/inetcredit/secure/order.pl?clientip=';
+  // const TEST_URL = 'https://secure.telecomcredit.co.jp/inetcredit/secure/order.pl?clientip=';
 }
 
 ?>
