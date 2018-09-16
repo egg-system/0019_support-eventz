@@ -45,7 +45,7 @@ class Constant
   // リダイレクト先
   const REDIRECT_URL = '/register_complete';
   // サポートカフェサイトURL
-  // const SITE_URL = 'http://sample004.eggsystem.co.jp';
+  // const TEST_SITE_URL = 'http://sample004.eggsystem.co.jp';
   const SITE_URL = 'https://support.eventz.jp';
   // サポートカフェ テレコムクレジット決済URL
   const TELECOM_CREDIT_FORM_URL = 'https://secure.telecomcredit.co.jp/inetcredit/adult/order.pl?clientip=';
