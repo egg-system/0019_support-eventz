@@ -42,7 +42,7 @@ class AutoRegistration {
 
             // プレミアム代理店主催の場合、moneyパラメーターへ指定する金額が変化する
             $fee = ($member_level == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) ? Constant::PREMIUM_AGENCY_ORGANIZER_URL_FEE : $money;
-            $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$fee}&rebill_param_id=30day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$fee}&rebill_param_id=1month{$money}yen_end&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
             // $paymentUrl = Constant::TEST_URL.$client_ip."&money={$fee}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
 
             header("Location: {$paymentUrl}");
@@ -170,7 +170,6 @@ class AutoRegistration {
     public function receive_telecom_result_continue() {
         //IPアドレスでテレコムからのアクセスであることを確認
         $is_telecom_access = $this->_isTelecomIpAccessed();
-        $is_telecom_access = true;
         if (!$is_telecom_access) {
           echo('不正なアクセスです。');
           return;
