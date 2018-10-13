@@ -3,6 +3,7 @@
 namespace AutoReg;
 
 include_once(__DIR__ . "/constant.php");
+include_once(__DIR__ . "/mailConstant.php");
 
 class AutoRegistration {
 
@@ -37,7 +38,7 @@ class AutoRegistration {
             }
 
             $redirectUrl = site_url().Constant::REDIRECT_URL;
-            // $client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
+            //$client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
             $client_ip = (site_url() == Constant::SITE_URL) ? Constant::PRODUCT_CLIENT_IP : Constant::TEST_CLIENT_IP;
 
             // プレミアム代理店主催の場合、moneyパラメーターへ指定する金額が変化する
@@ -104,38 +105,36 @@ class AutoRegistration {
      * @return void
      */
      public function _sendInitPaymentMail($email, $member_info) {
-        // 件名
-        $subject = "【サポートイベント】会員登録完了";
-        // 共通
-        $common_msg = "サポートイベント運営事務局です。<br>
-                 <br>会員登録が全て完了いたしました。<br>
-                 <br>ログイン後、マイページのご利用が可能となります。
-                 <br>https://support.eventz.jp/membership-login/membership-profile<br>
-                 <br>※マイページでは「登録情報の変更」「報酬金額の確認」「出金申請」を行うことができます。<br>
-                 <br>=========================
-                 <br>　　会員情報
-                 <br>=========================
-                 <br>会員ID: {$member_info['member_id']}
-                 <br>ログインID: {$member_info['login_id']}
-                 <br>メールアドレス: {$email}
-                 <br>電話番号: {$member_info['tel']}
-                 <br>氏名（漢字）: {$member_info['kanji']}
-                 <br>氏名(かな）: {$member_info['kana']}
-                 <br>紹介者コード（紹介者の会員ID）: {$member_info['introducer_id']}
-                 <br>利用規約 (https://support.eventz.jp/kiyaku/) に同意しました";
 
-        // 会員レベル毎に異なる表示内容を取得
-        $each_member_msg = $this->_getCompMailContents($member_info);
+         // XX様
+         $head_name = $member_info['kanji'] . " 様<br>";
 
-        // フッター
-        $footer_msg = "<br>今後ともサポートイベントをよろしくお願いいたします。
-                 <br>---
-                 <br>サポートイベント運営事務局(https://support.eventz.jp)
-                 <br>cafesuppo@gmail.com<br>";
-        $message = $common_msg . $each_member_msg . $footer_msg;
-        // ヘッダー
-        $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
-        wp_mail($email, $subject, $message, $headers);
+         // 会員レベル毎に異なる表示内容を取得
+         $each_member_contents = $this->_getEachMemberLevelMsg($member_info);
+
+         // 会員レベル毎の文面
+         $subject = ""; // 件名
+         $message = "";
+         if ($member_info['level'] == Constant::UNPAID_PREMIUM_MEMBER) {
+           // プレミアム会員
+           $subject = "【重要】【サポートイベント】プレミアム会員決済登録確認完了のお知らせ";
+           $premiumMsg01 = MailConstant::PREMIUM_MEMBER_MAIL01;
+           $premiumMsg02 = MailConstant::PREMIUM_MEMBER_MAIL02;
+           $message = $premiumMsg01 . $each_member_contents . $premiumMsg02;
+         } else {
+           // プレミアム代理店会員、代理店&主催会員
+           $subject= "【重要】【サポートカフェ】プレミアム代理店決済登録確認完了のお知らせ";
+           $agenciesMsg01 = MailConstant::PREMIUM_AGENCIES_MEMBER_MAIL01;
+           $agenciesMsg02 = MailConstant::PREMIUM_AGENCIES_MEMBER_MAIL02;
+           $message = $agenciesMsg01 . $each_member_contents . $agenciesMsg02;
+         }
+
+         // 全文
+         $all_message = $head_name . $message;
+
+         // ヘッダー
+         $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
+         wp_mail($email, $subject, $all_message, $headers);
     }
 
     /**
@@ -143,23 +142,47 @@ class AutoRegistration {
      *
      * @return String
      */
-    private function _getCompMailContents($member_info) {
+    private function _getEachMemberLevelMsg($member_info) {
+        // 会員情報
+        $common_msg = "<br>=========================
+                <br>　　会員情報
+                <br>=========================
+                <br>会員ID: {$member_info['member_id']}
+                <br>ログインID: {$member_info['login_id']}
+                <br>メールアドレス: {$email}
+                <br>電話番号: {$member_info['tel']}
+                <br>氏名（漢字）: {$member_info['kanji']}
+                <br>氏名(かな）: {$member_info['kana']}
+                <br>紹介者コード（紹介者の会員ID）: {$member_info['introducer_id']}";
+
         $msg = "";
         switch($member_info['level']) {
         case Constant::UNPAID_PREMIUM_MEMBER:
-            $msg = "<br>会員レベル: プレミアム会員<br>";
+            $msg = "<br>利用規約 (https://support.eventz.jp/kiyaku/) に同意しました
+                    <br>会員レベル: プレミアム会員
+                    <br>=========================
+                    <br>
+                    <br>";
             break;
         case Constant::UNPAID_PREMIUM_AGENCY:
-            $msg = "<br>会員レベル: プレミアム代理店会員<br>";
+            $msg = "<br>利用規約 (https://support.eventz.jp/kiyaku/) に同意しました
+                    <br>会員レベル: プレミアム代理店会員
+                    <br>=========================
+                    <br>
+                    <br>";
             break;
         case Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER:
             $msg = "<br>主催者利用規約 ( https://support.eventz.jp/syusai-kiyaku ) に同意しました
-                　  <br>会員レベル: プレミアム代理店会員&主催<br>";
+                    <br>会員レベル: プレミアム代理店会員&主催
+                    <br>=========================
+                    <br>
+                    <br>";
             break;
         default:
               return $msg;
         }
-        return $msg;
+
+        return $common_msg . $msg;
     }
 
     /**
@@ -174,7 +197,6 @@ class AutoRegistration {
           echo('不正なアクセスです。');
           return;
         }
-
         // 継続決済失敗時の処理
         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no') {
             $email = $_GET['email'];
@@ -183,8 +205,10 @@ class AutoRegistration {
             if (!array_key_exists('level', $member_info) || is_null($member_info['level'])) {
                return;
             }
+
             // 未決済会員レベル取得
             $unpaid_member_level = $this->_getUnpaidMemberLevel($member_info['level']);
+
             // 会員レベルを未決済を戻す
             $member_table = $this->tablePrefix."swpm_members_tbl";
             $upd_result = $this->wpdb->update($member_table, array('membership_level' => $unpaid_member_level), array('email' => $_GET['email']));
@@ -222,10 +246,10 @@ class AutoRegistration {
      * @return int
      */
     private function _getMemberFee($memberLevel) {
-        // 5,6,7のいずれかの場合、5000,8000,8000
-        if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_FEE;
-        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_FEE;
-        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE;
+        // 5,6,7のいずれかの場合
+        if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_FEE; // 5000
+        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_FEE; // 8000
+        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE; // 8000
         return null;
     }
 
@@ -250,7 +274,6 @@ class AutoRegistration {
     private function _getUnpaidMemberLevel($level) {
         // 2回以上決済失敗の場合は5,6,7のいずれかとなる為、そのまま返す
         if ($level <= Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return $level;
-
         // 8,9,10いずれかの場合、5,6,7を返す
         if ($level == Constant::PREMIUM_MEMBER_LEVEL) return Constant::UNPAID_PREMIUM_MEMBER;
         if ($level == Constant::PREMIUM_AGENCY_LEVEL) return Constant::UNPAID_PREMIUM_AGENCY;
@@ -361,6 +384,11 @@ class AutoRegistration {
         return true;
     }
 
+    /**
+     * 紹介者ID間違い時のレコード削除
+     *
+     * @retuen void
+     */
     private function _deleteIncorrectUser($email) {
         $table = $this->tablePrefix."swpm_members_tbl";
         $this->wpdb->delete( $table, array('email' => $email), array('%s'));
