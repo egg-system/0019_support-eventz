@@ -9,6 +9,10 @@ class Done
     // DBからデータを取得するオブジェクト
     private $dao = null;
     
+    // パラメータ
+    private $nonce = "";
+    private $price = 0;
+
     // テンプレートで使う変数
     public $error = "";
 
@@ -31,26 +35,56 @@ class Done
      */
     public function exec()
     {
-        $price = $this->getParam();
+        $this->setParam();
+        $checkParam = $this->checkParam($this->price, $this->nonce);
+        // パラメータエラーは終了
+        if (!$checkParam) {
+            return false;
+        }
         
         $membersId = \SwpmMemberUtils::get_logged_in_members_id();
         
         // 出金データの登録
-        $result = $this->insertOutput($membersId, $price);
+        $result = $this->insertOutput($membersId, $this->price);
         if ($result) {
             // 出金申請完了のメールを送る
-            $mailDone = $this->sendDoneMail($membersId, $price);
+            $mailDone = $this->sendDoneMail($membersId, $this->price);
         }
     }
     
     /**
-     * パラメータの取得
+     * パラメータのセット
      *
      * @return void
      */
-    private function getParam()
+    private function setParam()
     {
-        return $_POST['price'];
+        $this->nonce = $_POST['nonce'];
+        $this->price = $_POST['price'];
+    }
+    
+    /**
+     * パラメータのチェック
+     *
+     * @param int $price
+     * @param string $nonce
+     * @return boolean
+     */
+    private function checkParam($price, $nonce)
+    {
+        // nonceのチェック
+        if (!wp_verify_nonce($nonce, Constant::NONCE_CONFIRM_PAGE)) {
+            $this->error = "不正な遷移です。";
+            return false;
+        }
+
+        // 未設定の場合はエラーメッセージは出さない
+        if ($price === null || $price === '') {
+            $this->error = "出金金額を入力して下さい。";
+            return false;
+        }
+
+        return true;
     }
     
     /**
@@ -62,12 +96,6 @@ class Done
      */
     private function insertOutput($membersId, $price)
     {
-        // 未設定の場合はエラー
-        if ($price === null || $price === '') {
-            $this->error = "出金金額を入力して下さい。";
-            return false;
-        }
-
         // 出金データの登録
         $result = $this->dao->insertOutput($membersId, -$price);
 
