@@ -155,6 +155,29 @@ TEXT;
         // メール送信
         $result = wp_mail($memberInfo['email'], $subject, $message);
 
+        // サイト管理者に送るメール
+        $subjectAdmin = '[サイト管理者用]ユーザーによる出金申請がありました';
+        $messageAdmin = <<<TEXT
+サイト管理者様
+
+ユーザーによる出金が行われました。
+
+==============================
+　出金申請内容
+==============================
+・出金申請日
+${nowDate}
+
+・出金申請額
+${price}円
+
+・出金者
+${name} 様
+TEXT;
+        // メール送信
+        $resultAdmin = wp_mail($siteMail, $subjectAdmin, $messageAdmin);
+
+        // エラー画面を出すのはユーザーに送るメールに失敗した場合のみ
         if ($result === false) {
             $this->error = "メールの送信に失敗しました。";
             return false;
