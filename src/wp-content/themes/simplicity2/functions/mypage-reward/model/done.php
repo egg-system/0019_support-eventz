@@ -156,11 +156,11 @@ TEXT;
         $result = wp_mail($memberInfo['email'], $subject, $message);
 
         // サイト管理者に送るメール
-        $subjectAdmin = '[サイト管理者用]ユーザーによる出金申請がありました';
+        $subjectAdmin = '[サイト管理者用]会員による出金申請が行われました';
         $messageAdmin = <<<TEXT
 サイト管理者様
 
-ユーザーによる出金が行われました。
+会員による出金申請が行われました。
 
 ==============================
 　出金申請内容
@@ -172,6 +172,7 @@ ${nowDate}
 ${price}円
 
 ・出金者
+ID:${membersId}
 ${name} 様
 TEXT;
         // メール送信
