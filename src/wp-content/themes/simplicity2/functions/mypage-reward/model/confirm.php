@@ -9,6 +9,9 @@ class Confirm
     // DBからデータを取得するオブジェクト
     private $dao = null;
 
+    // nonce
+    private $nonce = "";
+
     // テンプレートで使う変数
     public $price = 0;
     public $error = "";
@@ -32,28 +35,36 @@ class Confirm
      */
     public function exec()
     {
-        $this->price = $this->getParam();
-        $result = $this->checkParam($this->price);
+        $this->setParam();
+        $this->checkParam($this->price, $this->nonce);
     }
     
     /**
-     * パラメータの取得
+     * パラメータのセット
      *
      * @return void
      */
-    private function getParam()
+    private function setParam()
     {
-        return $_POST['price'];
+        $this->nonce = $_POST['nonce'];
+        $this->price = $_POST['price'];
     }
     
     /**
      * 引数のチェック
      *
      * @param int $price
+     * @param string $nonce
      * @return boolean
      */
-    private function checkParam($price)
+    private function checkParam($price, $nonce)
     {
+        // nonceのチェック
+        if (!wp_verify_nonce($nonce, Constant::NONCE_DETAIL_PAGE)) {
+            $this->error = "不正な遷移です。";
+            return false;
+        }
+
         // 未設定の場合はエラーメッセージは出さない
         if ($price === null || $price === '') {
             $this->error = "出金金額を入力して下さい。";

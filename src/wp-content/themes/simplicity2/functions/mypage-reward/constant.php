@@ -40,4 +40,8 @@ class Constant
 
     // サイトの管理者メール
     const SITE_MAIL = "cafesuppo@gmail.com";
+
+    // nonce値 ※gitにはコミットしない
+    const NONCE_DETAIL_PAGE = '';
+    const NONCE_CONFIRM_PAGE = '';
 }
