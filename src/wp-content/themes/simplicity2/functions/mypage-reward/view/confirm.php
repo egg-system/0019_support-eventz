@@ -21,3 +21,7 @@
         </form>
     </div>
 <?php } ?>
+<script type="text/javascript">
+// 画面いっぱいにする
+document.getElementById('main').style.width = '100%';
+</script>
