@@ -112,6 +112,7 @@
   <div class="card-body">
     <form class="form-inline" action="<?php echo Reward\Constant::CONFIRM_PAGE_URL; ?>" method="post">
       <input type="number" class="form-control col-4" placeholder="¥30,000" name="price" value="">
+      <input type="hidden" name="nonce" value="<?php echo wp_create_nonce(Reward\Constant::NONCE_DETAIL_PAGE);?>">
       &nbsp;/&nbsp;<?php echo number_format($detail->totalPrice); ?>
       <?php if ($detail->totalPrice < Reward\Constant::MINIMUM_OUTPUT_PRICE) { ?>
         <button type="submit" class="btn btn-secondary" disabled>申請</button>
