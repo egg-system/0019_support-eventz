@@ -54,6 +54,12 @@ class Constant
   const TELECOM_CREDIT_FORM_URL = 'https://secure.telecomcredit.co.jp/inetcredit/secure/order.pl?clientip=';
   // テスト用(要コメントアウト)
   // const TEST_URL = 'https://secure.telecomcredit.co.jp/inetcredit/secure/order.pl?clientip=';
+
+  // Slack API
+  // 初回決済
+  const FIRST_PAY = 1;
+  // 継続決済
+  const CONTINUE_PAY = 2;
 }
 
 ?>

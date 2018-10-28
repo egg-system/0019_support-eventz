@@ -79,21 +79,26 @@ class AutoRegistration {
               return;
            }
 
-           // フォームにて入力された分のレコードの更新
+           // フォームにて入力された分のレコードの会員レベル更新
            $member_table = $this->tablePrefix."swpm_members_tbl";
            $upd_result = $this->wpdb->update($member_table, array('membership_level' => $membership_level), array('email' => $_GET['email']));
            if (false === $upd_result) {
               return;
            }
 
+           // 紹介者報酬登録
            $ins_result = $this->_insertIntroducedReward($email);
            if (false === $ins_result) {
               return;
            }
 
+           // 初回決済完了メール
            $this->_sendInitPaymentMail($email, $member_info);
            echo('決済認証成功');
          } else {
+           // Slackへの通知
+           $email = $_GET['email'];
+           if (isset($_GET['email'])) $this->_messageSlack(Constant::FIRST_PAY, $email);
            echo('決済認証失敗');
          }
     }
@@ -206,6 +211,9 @@ class AutoRegistration {
                return;
             }
 
+            // Slackへの通知
+            $this->_messageSlack(Constant::CONTINUE_PAY, $email);
+
             // 未決済会員レベル取得
             $unpaid_member_level = $this->_getUnpaidMemberLevel($member_info['level']);
 
@@ -229,6 +237,25 @@ class AutoRegistration {
         }
     }
 
+    /**
+    * Slack Web API
+    *
+    * @return void
+    */
+    private function _messageSlack($paymentType, $email) {
+      // bot
+      $slackApiKey = 'xoxb-253968019206-465508768417-WPPOmWSd8lrZnTbEVrujmV1l';
+      $text = "";
+      if ($paymentType == Constant::CONTINUE_PAY) {
+        $text = '本番 継続決済でNG : user_mail ' . $email;
+      } else {
+        $text = '本番 初回決済でNG : user_mail ' . $email;
+      }
+      $text = urlencode($text);
+      $chName = '0019_support_log';
+      $url = "https://slack.com/api/chat.postMessage?token=${slackApiKey}&channel=%23${chName}&text=${text}";
+      file_get_contents($url);
+    }
 
     /**
      * テレコムアクセスチェック
@@ -285,7 +312,7 @@ class AutoRegistration {
     /**
      * 紹介報酬Insert
      *
-     * @rrturn int
+     * @return int
      */
     function _insertIntroducedReward($email) {
         $member = $this->_getMember($email);
@@ -305,8 +332,8 @@ class AutoRegistration {
         $rewardTable = $this->tablePrefix."reward_details";
         // 報酬詳細テーブルはmember_idとintroducer_idが逆となる
         // 例)456さんが123さんを紹介した場合：member_id:456、introducer_id:123
-        $data = ['member_id' => $member['introducer_id'],
-                 'introducer_id' => $member['member_id'],
+        $data = ['member_id' => $member['introducer_id'], // 123
+                 'introducer_id' => $member['member_id'], // 456
                  'date' => current_time('mysql', 1),
                  'level' => $member['level'],
                  'price' => $rewardPrice
