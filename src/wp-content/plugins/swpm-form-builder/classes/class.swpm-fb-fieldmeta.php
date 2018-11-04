@@ -417,11 +417,11 @@ class SwpmFbFieldmeta {
 	    }
 	}
         $form_item = sprintf(
-                '<div><input type="password" placeholder="' . __('Type password Here', 'simple-membership') . '" name="swpm-%1$d" id="%2$s" value="%3$s" class="swpm-text %4$s %5$s %6$s %7$s" /></div>', $field_id, $id_attr, $default, $size, $required, $validation, $css
+                '<div><input type="password" placeholder="' . __('パスワードを入力して下さい', 'simple-membership') . '" name="swpm-%1$d" id="%2$s" value="%3$s" class="swpm-text %4$s %5$s %6$s %7$s" /></div>', $field_id, $id_attr, $default, $size, $required, $validation, $css
         );
 	$validation=$prev_validation;
         $form_item .= sprintf(
-                '<div><input type="password" placeholder="' . __('Retype password Here', 'simple-membership') . '" name="swpm-%1$d_re" id="%2$s_re" value="%3$s" class="swpm-text %4$s %5$s %6$s %7$s" /></div>', $field_id, $id_attr, $default, $size, $required, $validation, $css
+                '<div><input type="password" placeholder="' . __('パスワードを入力して下さい', 'simple-membership') . '" name="swpm-%1$d_re" id="%2$s_re" value="%3$s" class="swpm-text %4$s %5$s %6$s %7$s" /></div>', $field_id, $id_attr, $default, $size, $required, $validation, $css
         );
 
         return (!empty($description) ) ?
