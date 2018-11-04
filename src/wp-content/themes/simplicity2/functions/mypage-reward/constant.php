@@ -25,6 +25,11 @@ class Constant
     const DONE_VIEW_FILE = __DIR__ . "/view/done.php";
     const DONE_PAGE_URL = "reward_done";
     
+    // マイページ
+    const MYPAGE_MODEL_FILE = __DIR__ . "/model/mypage.php";
+    const MYPAGE_VIEW_FILE = __DIR__ . "/view/mypage.php";
+    const MYPAGE_URL = "mypage";
+    
     // 最大表示期間
     const MAX_TERM = 6;
 
@@ -39,9 +44,10 @@ class Constant
     const MINIMUM_OUTPUT_PRICE = 30000;
 
     // サイトの管理者メール
-    const SITE_MAIL = "cafesuppo@gmail.com";
+    //const SITE_MAIL = "cafesuppo@gmail.com";
+    const SITE_MAIL = "ht.hikaru.takahashi@gmail.com";
 
     // nonce値 ※gitにはコミットしない
-    const NONCE_DETAIL_PAGE = '';
-    const NONCE_CONFIRM_PAGE = '';
+    const NONCE_DETAIL_PAGE = 'eefoaefeijfe2';
+    const NONCE_CONFIRM_PAGE = 'osirrrhorir1';
 }

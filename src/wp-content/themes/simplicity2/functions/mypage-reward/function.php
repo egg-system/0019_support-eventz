@@ -52,3 +52,13 @@ function reward_done() {
     $rewardController->done();
 }
 add_shortcode('reward_done', 'reward_done');
+
+/**
+ * マイページ
+ */
+function mypage() {
+    global $wpdb, $table_prefix;
+    $rewardController = new Reward\Controller($wpdb, $table_prefix);
+    $rewardController->mypage();
+}
+add_shortcode('mypage', 'mypage');

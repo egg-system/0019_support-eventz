@@ -132,4 +132,3 @@ document.getElementById('main').style.width = '100%';
 <?php } else { ?>
   <div class="alert alert-warning" role="alert">指定された期間の報酬はありません。</div>
 <?php } ?>
-

@@ -143,7 +143,8 @@ SQL;
         $bindSql = <<<SQL
 SELECT 
     first_name,
-    email
+    email,
+    company_name
 FROM ${membersTable}
 WHERE member_id = %d
 SQL;
