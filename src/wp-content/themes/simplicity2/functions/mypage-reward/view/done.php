@@ -6,5 +6,10 @@
     </div>
 <?php } ?>
 <a href="<?php echo Reward\Constant::DETAIL_PAGE_URL; ?>">
-<button type="submit" class="btn btn-success">マイページに戻る</button>
+<button type="submit" class="btn btn-success">報酬明細画面に戻る<a/button>
 </a>
+
+<script type="text/javascript">
+// 画面いっぱいにする
+document.getElementById('main').style.width = '100%';
+</script>
