@@ -48,6 +48,6 @@ class Constant
     const SITE_MAIL = "ht.hikaru.takahashi@gmail.com";
 
     // nonce値 ※gitにはコミットしない
-    const NONCE_DETAIL_PAGE = 'eefoaefeijfe2';
-    const NONCE_CONFIRM_PAGE = 'osirrrhorir1';
+    const NONCE_DETAIL_PAGE = '';
+    const NONCE_CONFIRM_PAGE = '';
 }
