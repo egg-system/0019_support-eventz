@@ -570,7 +570,7 @@ class SwpmFbForm extends SwpmFbFormCustom {
         $headers = 'From: ' . $from_address . "\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         if (!empty($this->formmeta->notification_setting)) {
-            $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+            $headers .= "Content-Type: text/html;\r\n";
         }
         $query = "SELECT alias FROM " . $wpdb->prefix . "swpm_membership_tbl WHERE id = " . $this->get_level_info('id');
         $member_info['membership_level_name'] = $wpdb->get_var($query);
@@ -588,15 +588,18 @@ class SwpmFbForm extends SwpmFbFormCustom {
         
         //Add the raw custom fields data to the email (if the merge tag is present).
         $custom_fields_arr = $this->custom;
-        $custom_field_values = array_values($custom_fields_arr);
-        $custom_fields_string = print_r($custom_field_values, true);
-        $body = str_replace('{raw_custom_fields}', $custom_fields_string, $body);
+		
+		foreach ($custom_fields_arr as $custom_field_id => $custom_field_value) {
+        	$body = str_replace("{{$custom_field_id}}", $custom_field_value, $body);
+		}
+		
         
         //Send the member notification email.
         $email = sanitize_email($this->formmeta->type == self::REGISTRATION ? $this->data['email'] : $this->member_info->email);
         
 	$subject = apply_filters('swpm_email_registration_complete_subject',$subject);
         $body = apply_filters('swpm_email_registration_complete_body',$body);//You can override the email to empty to disable this email.
+		
         wp_mail(trim($email), $subject, $body, $headers);
         SwpmLog::log_simple_debug('Form builder addon - registration complete email sent to: '.$email.'. From Email Address value used: '.$from_address, true);
         

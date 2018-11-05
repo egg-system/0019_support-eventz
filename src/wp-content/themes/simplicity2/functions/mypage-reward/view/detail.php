@@ -41,7 +41,17 @@
             <?php foreach ($detail->inputData as $id => $data) { ?>
                 <tr>
                     <td><?php echo $number; ?></td>
-                    <td><?php echo $data[0]['first_name']; ?></td>
+                    <td>
+                    <?php 
+                        if (($data[0]['first_name'] === '' || $data[0]['first_name'] === null) &&
+                            ($data[0]['member_id'] === '' || $data[0]['member_id'] === null)) {
+                            // 紹介者の名前とIDがない場合は過去分の累計報酬として扱う
+                            echo '過去の累計報酬額';
+                        } else {
+                            echo $data[0]['first_name'];
+                        }
+                    ?>
+                    </td>
                     <td><?php echo $data[0]['date']; ?></td>
                     <td><?php echo $data[0]['alias']; ?></td>
                     <?php foreach ($detail->allMonth as $month) { ?>
