@@ -14,6 +14,9 @@ class AutoRegistration {
     function __construct($wpdb, $tablePrefix) {
         $this->wpdb = $wpdb;
         $this->tablePrefix = $tablePrefix;
+
+        // タイムゾーンのセット
+        date_default_timezone_set('Asia/Tokyo');
     }
 
     /**
@@ -97,8 +100,8 @@ class AutoRegistration {
            echo('決済認証成功');
          } else {
            // Slackへの通知
-           $email = $_GET['email'];
-           if (isset($_GET['email'])) $this->_messageSlack(Constant::FIRST_PAY, $email);
+           $member_info = $this->_getMember($_GET['email']);
+           if (isset($_GET['email'])) $this->_msgPaymentErr(Constant::FIRST_PAY, $member_info['level']);
            echo('決済認証失敗');
          }
     }
@@ -200,6 +203,8 @@ class AutoRegistration {
         $is_telecom_access = $this->_isTelecomIpAccessed();
         if (!$is_telecom_access) {
           echo('不正なアクセスです。');
+          // Slackへ通知
+          $this->_msgIpErr($_GET['email'], $_SERVER["REMOTE_ADDR"]);
           return;
         }
         // 継続決済失敗時の処理
@@ -207,12 +212,11 @@ class AutoRegistration {
             $email = $_GET['email'];
             // 会員取得
             $member_info = $this->_getMember($email);
+            // Slack API 通知
+            $this->_msgPaymentErr(Constant::CONTINUE_PAY, $member_info['level']);
             if (!array_key_exists('level', $member_info) || is_null($member_info['level'])) {
                return;
             }
-
-            // Slackへの通知
-            $this->_messageSlack(Constant::CONTINUE_PAY, $email);
 
             // 未決済会員レベル取得
             $unpaid_member_level = $this->_getUnpaidMemberLevel($member_info['level']);
@@ -237,25 +241,48 @@ class AutoRegistration {
         }
     }
 
+
     /**
-    * Slack Web API
-    *
-    * @return void
-    */
-    private function _messageSlack($paymentType, $email) {
-      // bot
-      $slackApiKey = 'xoxb-253968019206-465508768417-WPPOmWSd8lrZnTbEVrujmV1l';
-      $text = "";
-      if ($paymentType == Constant::CONTINUE_PAY) {
-        $text = '本番 継続決済でNG : user_mail ' . $email;
-      } else {
-        $text = '本番 初回決済でNG : user_mail ' . $email;
-      }
-      $text = urlencode($text);
-      $chName = '0019_support_log';
-      $url = "https://slack.com/api/chat.postMessage?token=${slackApiKey}&channel=%23${chName}&text=${text}";
-      file_get_contents($url);
+     * IPアドレスNG通知
+     *
+     * @return void
+     */
+    private function _msgIpErr($email, $ipAddr) {
+        $text = "IPアドレスエラー:" . $ipAddr . " user_mail:" . $email;
+        $this->_sendSlackMsg($text);
     }
+
+
+    /**
+     * 決済NG通知
+     *
+     * @return void
+     */
+    private function _msgPaymentErr($paymentType, $level) {
+        $msgParams = $_GET['email'] . " 会員レベル:" . $level . " 結果可否(rel):" . $_GET['rel'] . " IPアドレス" . $_SERVER["REMOTE_ADDR"];
+        $text = "";
+        if ($paymentType == Constant::CONTINUE_PAY) {
+          $text = 'TEST 継続決済でNG : user_mail ' . $msgParams;
+        } else {
+          $text = 'TEST 初回決済でNG : user_mail ' . $msgParams;
+        }
+        $this->_sendSlackMsg($text);
+    }
+
+    /**
+     * Slack Web API
+     *
+     * @return void
+     */
+    private function _sendSlackMsg($msg) {
+        // bot
+        $slackApiKey = Constant::BOT_TOKEN;
+        $text = urlencode($msg);
+        $chName = '0019_support_log';
+        $url = "https://slack.com/api/chat.postMessage?token=${slackApiKey}&channel=%23${chName}&text=${text}";
+        file_get_contents($url);
+    }
+
 
     /**
      * テレコムアクセスチェック

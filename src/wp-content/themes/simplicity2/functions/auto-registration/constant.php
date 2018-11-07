@@ -60,6 +60,9 @@ class Constant
   const FIRST_PAY = 1;
   // 継続決済
   const CONTINUE_PAY = 2;
+  // bot token
+  const BOT_TOKEN = 'xoxb-253968019206-465508768417-WPPOmWSd8lrZnTbEVrujmV1l';
+  
 }
 
 ?>
