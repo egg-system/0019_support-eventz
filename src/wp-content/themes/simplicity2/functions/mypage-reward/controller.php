@@ -38,7 +38,7 @@ class Controller
             return;
         }
 
-        if (file_exists(Constant::DETAIL_MODEL_FILE) && 
+        if (file_exists(Constant::DETAIL_MODEL_FILE) &&
             file_exists(Constant::DETAIL_VIEW_FILE)) {
 
             include_once(Constant::DETAIL_MODEL_FILE);
@@ -69,7 +69,7 @@ class Controller
             include_once(Constant::CONFIRM_VIEW_FILE);
         }
     }
-    
+
     /**
      * 確認画面
      *
@@ -111,6 +111,28 @@ class Controller
             $done = new Model\Mypage($this->dao);
             $done->exec();
             include_once(Constant::MYPAGE_VIEW_FILE);
+        }
+    }
+
+    /**
+     * 自分の情報
+     *
+     * @return void
+     */
+    public function memberinfo()
+    {
+        // 早期リターン
+        if (\SwpmMemberUtils::is_member_logged_in() === false) {
+            return;
+        }
+
+        if (file_exists(Constant::MEMBERINFO_MODEL_FILE) &&
+            file_exists(Constant::MEMBERINFO_VIEW_FILE)) {
+
+            include_once(Constant::MEMBERINFO_MODEL_FILE);
+            $done = new Model\Memberinfo($this->dao);
+            $done->exec();
+            include_once(Constant::MEMBERINFO_VIEW_FILE);
         }
     }
 }

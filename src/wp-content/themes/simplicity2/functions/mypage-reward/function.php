@@ -6,16 +6,16 @@ require_once(__DIR__ . '/controller.php');
  */
 function enqueue_mypage_scripts() {
     // bootstrapファイルの読み込み
-    wp_enqueue_script( 
+    wp_enqueue_script(
         'bootstrap',
         get_template_directory_uri() . '/functions/mypage-reward/scripts/bootstrap/4.1.3/bootstrap.min.js'
     );
-    wp_enqueue_style( 
+    wp_enqueue_style(
         'bootstrap',
         get_template_directory_uri() . '/functions/mypage-reward/scripts/bootstrap/4.1.3/bootstrap.min.css'
     );
     // カスタムファイルの読み込み
-    wp_enqueue_style( 
+    wp_enqueue_style(
         'custom',
         get_template_directory_uri() . '/functions/mypage-reward/scripts/custom.css'
     );
@@ -62,3 +62,13 @@ function mypage() {
     $rewardController->mypage();
 }
 add_shortcode('mypage', 'mypage');
+
+/**
+ * ID, 名前など
+ */
+function memberinfo() {
+    global $wpdb, $table_prefix;
+    $rewardController = new Reward\Controller($wpdb, $table_prefix);
+    $rewardController->memberinfo();
+}
+add_shortcode('memberinfo', 'memberinfo');

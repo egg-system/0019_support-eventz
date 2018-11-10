@@ -24,12 +24,17 @@ class Constant
     const DONE_MODEL_FILE = __DIR__ . "/model/done.php";
     const DONE_VIEW_FILE = __DIR__ . "/view/done.php";
     const DONE_PAGE_URL = "reward_done";
-    
+
     // マイページ
     const MYPAGE_MODEL_FILE = __DIR__ . "/model/mypage.php";
     const MYPAGE_VIEW_FILE = __DIR__ . "/view/mypage.php";
     const MYPAGE_URL = "mypage";
-    
+
+    // 自分の情報
+    const MEMBERINFO_MODEL_FILE = __DIR__ . "/model/memberinfo.php";
+    const MEMBERINFO_VIEW_FILE = __DIR__ . "/view/memberinfo.php";
+    const MEMBERINFO_URL = "memberinfo";
+
     // 最大表示期間
     const MAX_TERM = 6;
 
