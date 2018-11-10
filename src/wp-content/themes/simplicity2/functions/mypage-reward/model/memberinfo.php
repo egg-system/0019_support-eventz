@@ -11,6 +11,10 @@ class Memberinfo
     // テンプレートで使う変数
     public $error = "";
 
+    // viewで表示する変数
+    public $membersId = "";
+    public $memberInfo = [];
+
     /**
      * コンストラクタ
      *
@@ -30,10 +34,10 @@ class Memberinfo
     public function exec()
     {
       // メンバーIDの取得
-      $membersId = \SwpmMemberUtils::get_logged_in_members_id();
+      $this->membersId = \SwpmMemberUtils::get_logged_in_members_id();
 
       // 必要なユーザーデータの取得
-      $memberInfo = $this->dao->getMemberInfo($membersId);
+      $this->memberInfo = $this->dao->getMemberInfo($this->membersId);
     }
 
 }

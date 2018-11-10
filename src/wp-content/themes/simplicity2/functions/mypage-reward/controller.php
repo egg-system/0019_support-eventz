@@ -130,8 +130,8 @@ class Controller
             file_exists(Constant::MEMBERINFO_VIEW_FILE)) {
 
             include_once(Constant::MEMBERINFO_MODEL_FILE);
-            $done = new Model\Memberinfo($this->dao);
-            $done->exec();
+            $mypage = new Model\Memberinfo($this->dao);
+            $mypage->exec();
             include_once(Constant::MEMBERINFO_VIEW_FILE);
         }
     }
