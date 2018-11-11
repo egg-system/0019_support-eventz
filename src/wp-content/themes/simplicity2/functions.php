@@ -7,6 +7,8 @@ require_once('functions/auto-registration/function.php');
 require_once('functions/support-rewards/support-reward-function.php');
 // マイページの報酬確認
 require_once('functions/mypage-reward/function.php');
+// トップページの記事取得
+require_once('functions/fetch-events/function.php');
 
 require_once(ABSPATH . 'wp-admin/includes/file.php');//WP_Filesystemの使用
 include 'lib/php-html-css-js-minifier.php'; //縮小化ライブラリ
