@@ -12,11 +12,17 @@
 
 <div id="list">
 <?php
-if (have_posts()) : // WordPress ループ
-  $count = 0;
-  foreach ( $data as $post ) : setup_postdata( $post );
-    include('parts/event_list.php');
-  endforeach;  // 繰り返し処理終了 ?>
+  if (have_posts()):
+    $count = 0;
+    while (have_posts()) {
+      the_post();
+      if (is_premium()) {
+        include('parts/event_list.php');
+      } else {
+        break;
+      }
+    }
+?>
   <div class="clear"></div>
 <?php 
   else : // ここから記事が見つからなかった場合の処理  
@@ -38,9 +44,21 @@ if (have_posts()) : // WordPress ループ
 <?php
 if (have_posts()) : // WordPress ループ
   $count = 0;
-  foreach ( $data as $post ) : setup_postdata( $post );
-    include('parts/event_list.php');
-  endforeach;  // 繰り返し処理終了 ?>
+  while (have_posts()) {
+    // premiumのループでカフェ会の記事を取得している可能性があるため
+    if (is_cafe()) {
+      the_post();
+    }
+    
+    if (is_cafe()) {
+      include('parts/event_list.php');
+    } else {
+      break;
+    }
+
+    the_post();
+  }
+?>
   <div class="clear"></div>
 <?php 
   else : // ここから記事が見つからなかった場合の処理  
@@ -48,11 +66,6 @@ if (have_posts()) : // WordPress ループ
   endif;
 ?>
 </div><!-- /#list -->
-
-<?php 
-// タグのイベント取得条件をリセット
-wp_reset_postdata();
-?>
 
 <?php
 ////////////////////////////
@@ -88,9 +101,20 @@ endif; ?>
 <?php
   if (have_posts()) : // WordPress ループ
     $count = 0;
-    foreach ( $data as $post ) : setup_postdata( $post );
-      include('parts/event_list.php');
-    endforeach;  // 繰り返し処理終了 
+    while (have_posts()) {
+      // カフェ会のループでセミナーの記事を取得している可能性があるため
+      if (is_seminer()) {
+        the_post();
+      }
+      
+      if (is_seminer()) {
+        include('parts/event_list.php');
+      } else {
+        break;
+      }
+
+      the_post();
+    }
 ?>
   <div class="clear"></div>
 <?php 
