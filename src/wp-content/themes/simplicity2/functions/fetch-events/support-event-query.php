@@ -1,12 +1,6 @@
 <?php
 
 class SuppotEventQuery {
-	// テスト環境、本番共通
-	const PLEMIUM_EVENT_TERM_ID = 174;
-	
-	const CAFE_EVENT_TERM_ID = 250;
-
-	const SEMINER_EVENT_TERM_ID = 337;
 
 	private $today_time;
 
