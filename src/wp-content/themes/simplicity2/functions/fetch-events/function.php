@@ -11,16 +11,27 @@ if (!class_exists('TopPageEventsProvider')) {
   	require_once('top-page-events-provider.php');
 } 
 
-add_actions('init', 'get_top_pege_events_provider');
-function get_top_pege_events_provider() {
+add_action('pre_get_posts', 'get_top_pege_events_provider');
+function get_top_pege_events_provider($query) {
 	if (!is_home() || !is_front_page()) {
 		return;
 	}
 
+	if (!$query->is_main_query()) {
+		return;
+	}
+	
 	$top_page_events_provider = new TopPageEventsProvider();
-	add_actions('posts_results', [&$top_page_events_provider, 'get_posts']);
-	add_filter('the_post', [&$top_page_events_ids, 'the_post']);
+	$top_page_events_provider->set_query_conditions($query);
+	add_filter('posts_results', [&$top_page_events_provider, 'posts_results']);
+	add_filter('have_events', [&$top_page_events_provider, 'have_events']);
 	add_filter('get_event_type', [&$top_page_events_provider, 'get_event_type']);
+	remove_filter('query_vars', 'eventorganiser_register_query_vars');
+	remove_filter('query_vars', '__return_false');
+}
+
+function have_events() {
+	return apply_filters('get_event_type', '');
 }
 
 function is_premium() {

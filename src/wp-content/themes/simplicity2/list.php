@@ -12,7 +12,7 @@
 
 <div id="list">
 <?php
-  if (have_posts()):
+  if (have_events()):
     $count = 0;
     while (have_posts()) {
       the_post();
@@ -42,7 +42,7 @@
 
 <!-- 通常のイベント一覧 -->
 <?php
-if (have_posts()) : // WordPress ループ
+if (have_events()) : // WordPress ループ
   $count = 0;
   while (have_posts()) {
     // premiumのループでカフェ会の記事を取得している可能性があるため
@@ -99,7 +99,7 @@ endif; ?>
 
 <div id="list">
 <?php
-  if (have_posts()) : // WordPress ループ
+  if (have_events()) : // WordPress ループ
     $count = 0;
     while (have_posts()) {
       // カフェ会のループでセミナーの記事を取得している可能性があるため
