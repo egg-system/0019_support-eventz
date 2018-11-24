@@ -12,7 +12,7 @@ class Memberinfo
     public $error = "";
 
     // viewで表示する変数
-    public $membersId = "";
+    public $memberId = "";
     public $memberInfo = [];
 
     /**
@@ -34,10 +34,10 @@ class Memberinfo
     public function exec()
     {
       // メンバーIDの取得
-      $this->membersId = \SwpmMemberUtils::get_logged_in_members_id();
+      $this->memberId = \SwpmMemberUtils::get_logged_in_members_id();
 
       // 必要なユーザーデータの取得
-      $this->memberInfo = $this->dao->getMemberInfo($this->membersId);
+      $this->memberInfo = $this->dao->getMemberInfo($this->memberId);
     }
 
 }

@@ -37,7 +37,7 @@ class Controller
         if (\SwpmMemberUtils::is_member_logged_in() === false) {
             return;
         }
-
+error_log(print_r($this->dao , true)."\n", 3, "/tmp/auto-registration.log");
         if (file_exists(Constant::DETAIL_MODEL_FILE) &&
             file_exists(Constant::DETAIL_VIEW_FILE)) {
 
@@ -130,8 +130,8 @@ class Controller
             file_exists(Constant::MEMBERINFO_VIEW_FILE)) {
 
             include_once(Constant::MEMBERINFO_MODEL_FILE);
-            $mypage = new Model\Memberinfo($this->dao);
-            $mypage->exec();
+            $myinfo = new Model\Memberinfo($this->dao);
+            $myinfo->exec();
             include_once(Constant::MEMBERINFO_VIEW_FILE);
         }
     }

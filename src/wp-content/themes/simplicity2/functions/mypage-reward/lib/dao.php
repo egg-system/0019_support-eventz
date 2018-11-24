@@ -18,8 +18,10 @@ class Dao
      */
     public function __construct($wpdb, $tablePrefix)
     {
+        global $wpdb;
+        global $table_prefix;
         $this->wpdb = $wpdb;
-        $this->tablePrefix = $tablePrefix;
+        $this->tablePrefix = $table_prefix;
     }
 
     /**
@@ -36,7 +38,7 @@ class Dao
         $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
         $membersTable = $this->tablePrefix . Constant::MEMBERS_TABLE;
         $memberShipTable = $this->tablePrefix . Constant::MEMBERSHIP_TABLE;
-        
+
         $bindSql = <<<SQL
 SELECT rd.id,
        DATE_FORMAT(rd.date, '%Y%m') as date,
@@ -46,9 +48,9 @@ SELECT rd.id,
        ms.alias
 FROM ${rewardDetailsTable} rd
 LEFT JOIN ${membersTable} me
-    ON rd.introducer_id = me.member_id 
+    ON rd.introducer_id = me.member_id
 LEFT JOIN ${memberShipTable} ms
-    ON rd.level = ms.id 
+    ON rd.level = ms.id
 WHERE rd.member_id = %d
 AND DATE_FORMAT(rd.date, '%Y%m') >= ${start}
 AND DATE_FORMAT(rd.date, '%Y%m') <= ${end}
@@ -70,7 +72,7 @@ SQL;
     {
         // 必要なテーブルの定義
         $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
-        
+
         $bindSql = <<<SQL
 SELECT sum(price) as price
 FROM ${rewardDetailsTable}
@@ -93,7 +95,7 @@ SQL;
     {
         // 必要なテーブルの定義
         $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
-        
+
         $bindSql = <<<SQL
 SELECT sum(price) as price
 FROM ${rewardDetailsTable}
@@ -117,7 +119,7 @@ SQL;
     {
         // 必要なテーブルの定義
         $rewardDetailsTable = $this->tablePrefix . Constant::REWARD_TABLE;
-        
+
         $data = ['member_id' => $membersId,
                  'date' => current_time('mysql', 1),
                  'price' => $price];
@@ -141,7 +143,7 @@ SQL;
         $membersTable = $this->tablePrefix . Constant::MEMBERS_TABLE;
 
         $bindSql = <<<SQL
-SELECT 
+SELECT
     first_name,
     email,
     company_name
