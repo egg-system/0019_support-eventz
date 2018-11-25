@@ -75,22 +75,15 @@ class AutoRegistration {
            if (!array_key_exists('introducer_id', $member_info) || is_null($member_info['introducer_id'])) {
               return;
            }
-           // 会員レベルの取得
-           $membership_level = $this->_getMemberLevel($member_info['level']);
-           // 会員レベルの取得が出来ていない場合処理なし
-           if (is_null($membership_level)) {
-              return;
-           }
 
-           // フォームにて入力された分のレコードの会員レベル更新
-           $member_table = $this->tablePrefix."swpm_members_tbl";
-           $upd_result = $this->wpdb->update($member_table, array('membership_level' => $membership_level), array('email' => $_GET['email']));
+           // 会員レベルの更新
+           $upd_result = $this->_updateMembershipLevel($email, $member_info);
            if (false === $upd_result) {
-              return;
+             return;
            }
 
            // 紹介者報酬登録
-           $ins_result = $this->_insertIntroducedReward($email);
+           $ins_result = $this->_insertIntroducedReward($email, $member_info);
            if (false === $ins_result) {
               return;
            }
@@ -207,8 +200,9 @@ class AutoRegistration {
           $this->_msgIpErr($_GET['email'], $_SERVER["REMOTE_ADDR"]);
           return;
         }
+
         // 継続決済失敗時の処理
-        if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no') {
+        if ($this->_isPaymentError($is_telecom_access)) {
             $email = $_GET['email'];
             // 会員取得
             $member_info = $this->_getMember($email);
@@ -221,9 +215,14 @@ class AutoRegistration {
             // 未決済会員レベル取得
             $unpaid_member_level = $this->_getUnpaidMemberLevel($member_info['level']);
 
-            // 会員レベルを未決済を戻す
+            // 会員レベルを未決済を戻し、statusをinactiveにする
             $member_table = $this->tablePrefix."swpm_members_tbl";
-            $upd_result = $this->wpdb->update($member_table, array('membership_level' => $unpaid_member_level), array('email' => $_GET['email']));
+            $upd_result = $this->wpdb->update($member_table,
+                                              array('membership_level' => $unpaid_member_level,
+                                                    'account_state' => 'inactive'),
+                                              array('email' => $email),
+                                              array('%s', '%s')
+                                             );
             if (false === $upd_result) {
               return;
             }
@@ -234,13 +233,36 @@ class AutoRegistration {
         //  継続決済成功後、紹介者報酬登録へ
         if ($is_telecom_access && isset($_GET['email'])) {
             $email = $_GET['email'];
-            $ins_result = $this->_insertIntroducedReward($email);
+            $member = $this->_getMember($email);
+
+            // 報酬テーブルに登録
+            $ins_result = $this->_insertIntroducedReward($email, $member);
+            if (false === $ins_result) {
+              return;
+            }
+
+            // 継続決済実行日を登録
+            $upd_result = $this->_updatePaymentDate($email, $member);
+            if (false === $upd_result) {
+              return;
+            }
+
+            // 会員レベルが未決済の状態なら、決済会員レベルに復活
+            $ins_result = $this->_updateMembershipLevel($email, $member);
             if (false === $ins_result) {
               return;
             }
         }
     }
 
+    /**
+     * 継続決済成功判定
+     *
+     * @return boolean
+     */
+    private function _isPaymentError($is_telecom_access) {
+        return $is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no';
+    }
 
     /**
      * IPアドレスNG通知
@@ -337,12 +359,59 @@ class AutoRegistration {
 
 
     /**
+     * 会員レベルをUpdate
+     *
+     * @return int
+     */
+    private function _updateMembershipLevel($email, $member_info) {
+
+        // 会員レベルの取得
+        $membership_level = $this->_getMemberLevel($member_info['level']);
+        // 会員レベルの取得が出来ていない場合処理なし
+        if (is_null($membership_level)) {
+          return;
+        }
+
+        // フォームにて入力された分のレコードの会員レベル更新
+        $member_table = $this->tablePrefix."swpm_members_tbl";
+        $upd_result = $this->wpdb->update($member_table, array('membership_level' => $membership_level), array('email' => $email));
+        if (false === $upd_result) {
+          return;
+        }
+
+        return $upd_result;
+    }
+
+
+    /**
+     * 継続決済実行日をUpdate
+     *
+     * @return int
+     */
+    private function _updatePaymentDate($email, $member_info) {
+
+        if (!array_key_exists('payment_date', $member_info) || !array_key_exists('account_state', $member_info)) {
+          return;
+        }
+        // 決済日とアカウントステータスを更新
+        $member_table = $this->tablePrefix."swpm_members_tbl";
+        $upd_result = $this->wpdb->update($member_table,
+                                          array('payment_date' => current_time('mysql', 1),
+                                                'account_state' => 'active'),
+                                          array('email' => $email),
+                                          array('%s', '%s')
+                                         );
+
+        return $upd_result;
+    }
+
+
+    /**
      * 紹介報酬Insert
      *
      * @return int
      */
-    function _insertIntroducedReward($email) {
-        $member = $this->_getMember($email);
+    function _insertIntroducedReward($email, $member) {
 
         // 紹介者IDが取得できない場合、
         if (!array_key_exists('introducer_id', $member) || is_null($member['introducer_id'])) {
@@ -409,7 +478,9 @@ class AutoRegistration {
           {$memberTable}.user_name AS login_id,
           {$memberTable}.phone AS tel,
           {$memberTable}.first_name AS kanji,
-          {$memberTable}.last_name AS kana
+          {$memberTable}.last_name AS kana,
+          {$memberTable}.account_state AS account_state,
+          {$memberTable}.payment_date AS payment_date
         FROM {$memberTable}
         LEFT JOIN (SELECT * FROM {$memberTable}) as introducerTable
         ON {$memberTable}.company_name = introducerTable.member_id
