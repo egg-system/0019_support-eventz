@@ -44,19 +44,15 @@
 <?php
 if (have_events()) : // WordPress ループ
   $count = 0;
+  if (is_cafe()) {
+    include('parts/event_list.php');
+  }
+
   while (have_posts()) {
-    // premiumのループでカフェ会の記事を取得している可能性があるため
-    if (is_cafe()) {
-      the_post();
-    }
-    
+    the_post();
     if (is_cafe()) {
       include('parts/event_list.php');
-    } else {
-      break;
     }
-
-    the_post();
   }
 ?>
   <div class="clear"></div>

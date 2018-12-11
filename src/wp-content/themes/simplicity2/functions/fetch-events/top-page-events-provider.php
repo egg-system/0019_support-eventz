@@ -79,7 +79,7 @@ class TopPageEventsProvider
 				return;
 		}
 
-		if (count($array) === $max_show) {
+		if (count($array) > $max_show) {
 			return;
 		}
 
