@@ -10,7 +10,7 @@
 
 <br>
 
-<div id="list">
+<div id="event-list">
 <?php
   if (have_events()):
     $count = 0;
@@ -38,7 +38,7 @@
 </div>
 <br>
 
-<div id="list">
+<div id="event-list">
 
 <!-- 通常のイベント一覧 -->
 <?php
@@ -89,37 +89,4 @@ endif; ?>
 <a style="font-size: 20px !important; background: #517fa4; padding: 0.1em 3.0em;" href="https://support.eventz.jp/events/tag/cafekai?order=desc&meta_key=_eventorganiser_schedule_start_start&orderby=meta_value">
 もっと見る
 </a>
-</div>
-
-<div id="Externalseminar">
-<h2><img src="http://support.eventz.jp/wp-content/uploads/2017/05/icon_hoshi02-1.svg">外部セミナー</img></h2>
-</div>
-<br>
-
-
-<div id="list">
-<?php
-  if (have_events()) : // WordPress ループ
-    $count = 0;
-    while (have_posts()) {
-      // カフェ会のループでセミナーの記事を取得している可能性があるため
-      if (is_seminer()) {
-        the_post();
-      }
-      
-      if (is_seminer()) {
-        include('parts/event_list.php');
-      } else {
-        break;
-      }
-
-      the_post();
-    }
-?>
-  <div class="clear"></div>
-<?php 
-  else : // ここから記事が見つからなかった場合の処理  
-    get_template_part('parts/event_not_found');
-  endif;
-?>
 </div><!-- /#list -->

@@ -61,11 +61,6 @@
       気軽にカフェ会へ参加したい
     </div>
   </a>
-  <a href="#Externalseminar">
-    <div class="button-seminar"> 
-      金融系のセミナーへ参加したい
-    </div>
-  </a>
 </div>
 
 <br>

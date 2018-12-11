@@ -10,13 +10,9 @@ class TopPageEventsProvider
 
 	const MAX_SHOW_CAFE_EVENT = 30;
 
-	const MAX_SHOW_SEMINER_EVENT = 50;
-
 	private $premium_event_metas = [];
 
 	private $cafe_event_metas = [];
-
-	private $seminer_event_metas = [];
 
 	public function __construct()
 	{
@@ -29,7 +25,7 @@ class TopPageEventsProvider
 		}
 
 		foreach ($post_metas as $post_meta) {
-			$is_premium = $post_meta['term_id'] === PLEMIUM_EVENT_TERM_ID;
+			$is_premium = intval($post_meta['term_id']) === PLEMIUM_EVENT_TERM_ID;
 			$in_two_week = $post_meta['event_date'] <= $query->two_week_later_time;
 			
 			if ($is_premium || $in_two_week) {
@@ -55,8 +51,7 @@ class TopPageEventsProvider
 	{
 		return array_merge(
 			array_keys($this->premium_event_metas),
-			array_keys($this->cafe_event_metas),
-			array_keys($this->seminer_event_metas)
+			array_keys($this->cafe_event_metas)
 		);
 	}
 
@@ -64,8 +59,7 @@ class TopPageEventsProvider
 	{
 		// キーの重複がない、かつindexの振り直しを避けるため、+演算子で結合
 		return $this->premium_event_metas
-			+ $this->cafe_event_metas
-			+ $this->seminer_event_metas;
+			+ $this->cafe_event_metas;
 	}
 
 	private function classify_post_metas($post_meta)
@@ -79,11 +73,6 @@ class TopPageEventsProvider
 			case CAFE_EVENT_TERM_ID:
 				$max_show = self::MAX_SHOW_CAFE_EVENT;
 				$array = &$this->cafe_event_metas;
-				break;
-
-			case SEMINER_EVENT_TERM_ID:
-				$max_show = self::MAX_SHOW_SEMINER_EVENT;
-				$array = &$this->seminer_event_metas;
 				break;
 
 			default: 

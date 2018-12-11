@@ -31,7 +31,7 @@ function get_top_pege_events_provider($query) {
 }
 
 function have_events() {
-	return apply_filters('get_event_type', '');
+	return apply_filters('have_events', '');
 }
 
 function is_premium() {
@@ -42,9 +42,4 @@ function is_premium() {
 function is_cafe() {
 	$term_id = apply_filters('get_event_type', get_the_ID());
 	return $term_id === CAFE_EVENT_TERM_ID;
-}
-
-function is_seminer() {
-	$term_id = apply_filters('get_event_type', get_the_ID());
-	return $term_id === SEMINER_EVENT_TERM_ID;
 }

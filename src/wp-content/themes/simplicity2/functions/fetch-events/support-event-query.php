@@ -24,7 +24,7 @@ class SupportEventQuery {
 	{
 		$query = [];
 		$query[] = "
-			select 
+			SELECT 
 				wp9_postmeta.post_id,
 				wp9_term_relationships.term_taxonomy_id AS term_id,
 				wp9_postmeta.meta_value AS event_date
@@ -45,7 +45,6 @@ class SupportEventQuery {
 		$term_ids = [
 			PLEMIUM_EVENT_TERM_ID,
 			CAFE_EVENT_TERM_ID,
-			SEMINER_EVENT_TERM_ID,
 		];
 		return implode(',', $term_ids);
 	}
