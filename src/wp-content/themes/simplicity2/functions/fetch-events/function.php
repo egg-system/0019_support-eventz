@@ -7,6 +7,8 @@ const CAFE_EVENT_TERM_ID = 250;
 
 const SEMINER_EVENT_TERM_ID = 337;
 
+const KANSAI_PREMIUM_TERM_ID = 733;
+
 if (!class_exists('TopPageEventsProvider')) {
   	require_once('top-page-events-provider.php');
 } 
@@ -42,4 +44,9 @@ function is_premium() {
 function is_cafe() {
 	$term_id = apply_filters('get_event_type', get_the_ID());
 	return $term_id === CAFE_EVENT_TERM_ID;
+}
+
+function is_kansai_premium() {
+	$term_id = apply_filters('get_event_type', get_the_ID());
+	return $term_id === KANSAI_PREMIUM_TERM_ID;
 }

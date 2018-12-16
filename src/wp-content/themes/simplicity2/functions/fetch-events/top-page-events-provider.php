@@ -14,6 +14,8 @@ class TopPageEventsProvider
 
 	private $cafe_event_metas = [];
 
+	private $kansai_premium_event_metas = [];
+
 	public function __construct()
 	{
 		global $wpdb;
@@ -51,7 +53,8 @@ class TopPageEventsProvider
 	{
 		return array_merge(
 			array_keys($this->premium_event_metas),
-			array_keys($this->cafe_event_metas)
+			array_keys($this->cafe_event_metas),
+			array_keys($this->kansai_premium_event_metas)
 		);
 	}
 
@@ -59,7 +62,8 @@ class TopPageEventsProvider
 	{
 		// キーの重複がない、かつindexの振り直しを避けるため、+演算子で結合
 		return $this->premium_event_metas
-			+ $this->cafe_event_metas;
+			+ $this->cafe_event_metas
+			+ $this->kansai_premium_event_metas;
 	}
 
 	private function classify_post_metas($post_meta)
@@ -71,6 +75,11 @@ class TopPageEventsProvider
 				break;
 
 			case CAFE_EVENT_TERM_ID:
+				$max_show = self::MAX_SHOW_CAFE_EVENT;
+				$array = &$this->cafe_event_metas;
+				break;
+
+			case KANSAI_PREMIUM_TERM_ID:
 				$max_show = self::MAX_SHOW_CAFE_EVENT;
 				$array = &$this->cafe_event_metas;
 				break;
