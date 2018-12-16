@@ -61,6 +61,11 @@
       気軽にカフェ会へ参加したい
     </div>
   </a>
+  <a href="#premium-k">
+    <div class="button-kigaru">
+      関西のイベントに参加したい
+    </div>
+  </a>
 </div>
 
 <br>

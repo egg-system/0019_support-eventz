@@ -45,6 +45,7 @@ class SupportEventQuery {
 		$term_ids = [
 			PLEMIUM_EVENT_TERM_ID,
 			CAFE_EVENT_TERM_ID,
+			KANSAI_PREMIUM_TERM_ID,
 		];
 		return implode(',', $term_ids);
 	}
