@@ -65,7 +65,7 @@ if (have_events()) : // WordPress ループ
 
 <br>
 <br>
-<div id="event">
+<div id="premium-k">
   <h2>
     <img src="http://support.eventz.jp/wp-content/uploads/2017/05/icon_hoshi02-1.svg">
       関西プレミアムイベント
