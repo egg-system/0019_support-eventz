@@ -61,6 +61,8 @@ class Constant
 
   // プレミアム代理店会員＆主催 初回決済時URLパラメーター指定金額
   const PREMIUM_AGENCY_ORGANIZER_URL_FEE = 40400;
+  // プレミアム代理店関西会員＆主催 初回決済時URLパラメーター指定金額
+  const PREMIUM_AGENCY_ORGANIZER_URL_FEE_WEST = 4000;
 
   // ---紹介報酬---
   // 関東

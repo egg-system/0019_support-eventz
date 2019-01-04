@@ -60,9 +60,9 @@ class AfterRegistration{
          $clientIp = (site_url() == Constant::SITE_URL) ? Constant::PRODUCT_CLIENT_IP : Constant::TEST_CLIENT_IP;
 
          // プレミアム代理店&主催の場合、moneyパラメーターへ指定する金額が変化する
-         $fee = ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) ? Constant::PREMIUM_AGENCY_ORGANIZER_URL_FEE : $money;
+         $fee = $this->_getPaymentFee($memberLevel, $money);
          $paymentUrl = Constant::TEST_URL.$clientIp."&money={$fee}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
-        //  $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$clientIp."&money={$fee}&rebill_param_id=1month{$money}yen_end&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+         // $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$clientIp."&money={$fee}&rebill_param_id=1month{$money}yen_end&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
 
          header("Location: {$paymentUrl}");
          exit;
@@ -70,6 +70,26 @@ class AfterRegistration{
          // 会員登録失敗の会員を削除
          $this->dao->deleteIncorrectUser($this->formData['email']);
       }
+  }
+
+
+  /**
+   * 当月(決済時点)の算出
+   *
+   * @return string
+   */
+  private function _getPaymentFee($memberLevel, $money) {
+      $fee = "";
+      if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) {
+        // 関東
+        $fee = Constant::PREMIUM_AGENCY_ORGANIZER_URL_FEE;
+      } else if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER_WEST) {
+        // 関西
+        $fee = Constant::PREMIUM_AGENCY_ORGANIZER_URL_FEE_WEST;
+      } else {
+        $fee = $money;
+      }
+      return $fee;
   }
 
 } // end of class

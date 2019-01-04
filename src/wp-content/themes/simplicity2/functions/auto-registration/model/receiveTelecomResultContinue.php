@@ -90,7 +90,7 @@ class ReceiveTelecomResultContinue {
          return;
       }
 
-      // 会員レベルを未決済を戻し、statusをinactiveにする
+      // 会員レベルを未決に戻し、stateをinactiveにする
       $updResult = $this->dao->updateMembershipLevelReturns($this->email, $memberInfo)
       if (false === $updResult) {
         return;
