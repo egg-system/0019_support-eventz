@@ -4,8 +4,7 @@ namespace AutoReg;
 require_once(__DIR__ . "/../constant.php");
 require_once(__DIR__ . "/dao.php");
 
-class AutoRegUtils
-{
+class AutoRegUtils {
 
   /**
    * テレコムアクセスチェック
@@ -41,9 +40,15 @@ class AutoRegUtils
    */
   public static function getMemberLevel($memberLevel) {
       // 5,6,7のいずれかの場合、8,9,10
+      // 関東
       if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_LEVEL;
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_LEVEL;
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL;
+      // 11,12,13のいずれかの場合、14,15,16
+      // 関西
+      if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER_WEST) return Constant::PREMIUM_MEMBER_LEVEL_WEST;
+      if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_WEST) return Constant::PREMIUM_AGENCY_LEVEL_WEST;
+      if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER_WEST) return Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL_WEST;
       return null;
   }
 
@@ -79,8 +84,10 @@ class AutoRegUtils
       case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL:
         return Constant::PREMIUM_AGENCY_ORGANIZER_INTRODUCE_FEE; // 4000
       // 関西
+      case Constant::PREMIUM_MEMBER_LEVEL_WEST:
+        return Constant::PREMIUM_MEMBER_INTRODUCE_FEE_WEST; // 1000
       case Constant::PREMIUM_AGENCY_LEVEL_WEST:
-        return Constant::PREMIUM_AGENCY_INTRODUCE_FEE_WEST; // 1000
+        return Constant::PREMIUM_AGENCY_INTRODUCE_FEE_WEST; // 2000
       case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL_WEST:
         return Constant::PREMIUM_AGENCY_ORGANIZER_INTRODUCE_FEE_WEST; // 2000
       default:
