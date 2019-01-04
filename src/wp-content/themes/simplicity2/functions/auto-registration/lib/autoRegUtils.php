@@ -26,6 +26,7 @@ class AutoRegUtils {
       if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_FEE; // 5000
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_FEE; // 8000
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE; // 8000
+      // 11,12,13のいずれかの場合、14,15,16
       if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER_WEST) return Constant::PREMIUM_MEMBER_FEE_WEST; // 2000
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_WEST) return Constant::PREMIUM_AGENCY_FEE_WEST; // 4000
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER_WEST) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE_WEST; // 4000
@@ -62,9 +63,15 @@ class AutoRegUtils {
       // 2回以上決済失敗の場合は5,6,7のいずれかとなる為、そのまま返す
       if ($level <= Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return $level;
       // 8,9,10いずれかの場合、5,6,7を返す
+      // 関東
       if ($level == Constant::PREMIUM_MEMBER_LEVEL) return Constant::UNPAID_PREMIUM_MEMBER;
       if ($level == Constant::PREMIUM_AGENCY_LEVEL) return Constant::UNPAID_PREMIUM_AGENCY;
       if ($level == Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL) return Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER;
+      // 11,12,13のいずれかの場合、14,15,16
+      // 関西
+      if ($level == Constant::PREMIUM_MEMBER_LEVEL_WEST) return Constant::UNPAID_PREMIUM_MEMBER_WEST;
+      if ($level == Constant::PREMIUM_AGENCY_LEVEL_WEST) return Constant::UNPAID_PREMIUM_AGENCY_WEST;
+      if ($level == Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL_WEST) return Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER_WEST;
       return null;
   }
 

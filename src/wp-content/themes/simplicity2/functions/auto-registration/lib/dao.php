@@ -171,7 +171,7 @@ class Dao{
 
 
   /**
-   * 紹介報酬Insert
+   * 未決済会員レベルに戻す
    *
    * @return int
    */
