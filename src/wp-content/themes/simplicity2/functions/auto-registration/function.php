@@ -1,5 +1,5 @@
 <?php
-
+require_once(__DIR__ . '/controller.php');
 require_once(__DIR__ . '/auto-registration.php');
 
 /**
@@ -11,6 +11,10 @@ function after_registration_func($form_data) {
     global $wpdb, $table_prefix;
     $autoRegistration = new AutoReg\AutoRegistration($wpdb, $table_prefix);
     $autoRegistration->after_registration($form_data);
+
+    // global $wpdb, $tablePrefix;
+    // $autoRegController = new AutoReg\Controller($wpdb, $tablePrefix);
+    // $autoRegController->after_registration($form_data);
 }
 
 /**
@@ -19,9 +23,9 @@ function after_registration_func($form_data) {
  */
 add_shortcode('receive_telecom_result', 'receive_telecom_result_func');
 function receive_telecom_result_func() {
-    global $wpdb, $table_prefix;
-    $autoRegistration = new AutoReg\AutoRegistration($wpdb, $table_prefix);
-    $autoRegistration->receive_telecom_result();
+    global $wpdb, $tablePrefix;
+    $receiveTelecomResultController = new AutoReg\Controller($wpdb, $tablePrefix);
+    $receiveTelecomResultController->receive_telecom_result();
 }
 
 /**
@@ -30,9 +34,9 @@ function receive_telecom_result_func() {
  */
 add_shortcode('receive_telecom_result_continue', 'receive_telecom_result_continue_func');
 function receive_telecom_result_continue_func() {
-    global $wpdb, $table_prefix;
-    $autoRegistration = new AutoReg\AutoRegistration($wpdb, $table_prefix);
-    $autoRegistration->receive_telecom_result_continue();
+    global $wpdb, $tablePrefix;
+    $receiveTelecomResultContinueController = new AutoReg\Controller($wpdb, $tablePrefix);
+    $receiveTelecomResultContinueController->receive_telecom_result_continue();
 }
 
 /**

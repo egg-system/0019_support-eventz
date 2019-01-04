@@ -19,6 +19,7 @@ class AutoRegistration {
         date_default_timezone_set('Asia/Tokyo');
     }
 
+
     /**
      * 会員登録時パラメーターを取得してURLに設定
      *
@@ -41,13 +42,25 @@ class AutoRegistration {
             }
 
             $redirectUrl = site_url().Constant::REDIRECT_URL;
-            //$client_ip = (site_url() == 'http://www.c-lounge.club') ? PRODUCT_CLIENT_IP : TEST_CLIENT_IP;
             $client_ip = (site_url() == Constant::SITE_URL) ? Constant::PRODUCT_CLIENT_IP : Constant::TEST_CLIENT_IP;
 
             // プレミアム代理店主催の場合、moneyパラメーターへ指定する金額が変化する
+            // TODO 関東と関西でURL降り分け
+            // $paymentUrl = '';
+            // if (in_array(intval($member_level), Constant::MEMBER_LEVEL_ARY_WEST, true)) {
+            //   // 関西
+            //   $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$fee}&rebill_param_id=1month{$money}yen_end&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            // } else {
+            //   // 関東
+            //   $fee = ($member_level == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) ? Constant::PREMIUM_AGENCY_ORGANIZER_URL_FEE : $money;
+            //   //$paymentUrl = Constant::TEST_URL.$client_ip."&money={$fee}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            //   $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$fee}&rebill_param_id=1month{$money}yen_end&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+            // }
+
+            // プレミアム代理店&主催の場合、moneyパラメーターへ指定する金額が変化する
             $fee = ($member_level == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) ? Constant::PREMIUM_AGENCY_ORGANIZER_URL_FEE : $money;
+            //$paymentUrl = Constant::TEST_URL.$client_ip."&money={$fee}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
             $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$client_ip."&money={$fee}&rebill_param_id=1month{$money}yen_end&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
-            // $paymentUrl = Constant::TEST_URL.$client_ip."&money={$fee}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
 
             header("Location: {$paymentUrl}");
             exit;
@@ -66,25 +79,36 @@ class AutoRegistration {
      public function receive_telecom_result() {
          //IPアドレスでテレコムからのアクセスであることを確認
          $is_telecom_access = $this->_isTelecomIpAccessed();
-         if ($is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && isset($_GET['money']) && $_GET['rel'] == 'yes') {
+         if ($this->_isPaymentSucceed($is_telecom_access)) {
            $email = $_GET['email'];
            $fee = $_GET['money'];
 
            // 会員取得
            $member_info = $this->_getMember($email);
            if (!array_key_exists('introducer_id', $member_info) || is_null($member_info['introducer_id'])) {
+              $this->_sendErrEmailRegistration($email, $member_info);
+              $this->_initPaymentErr($email, "会員取得処理失敗");
               return;
            }
 
            // 会員レベルの更新
            $upd_result = $this->_updateMembershipLevel($email, $member_info);
            if (false === $upd_result) {
-             return;
+              $this->_initPaymentErr($email, "会員レベル更新処理失敗");
+              return;
            }
 
            // 紹介者報酬登録
            $ins_result = $this->_insertIntroducedReward($email, $member_info);
            if (false === $ins_result) {
+              $this->_initPaymentErr($email, "紹介者報酬登録失敗");
+              return;
+           }
+
+           // 決済成功日更新
+           $upd_result = $this->_updatePaymentDate($email, $member_info);
+           if (false === $upd_result) {
+              $this->_initPaymentErr($email, "決済日更新処理失敗");
               return;
            }
 
@@ -95,6 +119,10 @@ class AutoRegistration {
            // Slackへの通知
            $member_info = $this->_getMember($_GET['email']);
            if (isset($_GET['email'])) $this->_msgPaymentErr(Constant::FIRST_PAY, $member_info['level']);
+
+           // 初回決済エラーのお知らせメール
+           $this->_sendPaymentErrMail($_GET['email'], $member_info);
+
            echo('決済認証失敗');
          }
     }
@@ -124,7 +152,7 @@ class AutoRegistration {
            $message = $premiumMsg01 . $each_member_contents . $premiumMsg02;
          } else {
            // プレミアム代理店会員、代理店&主催会員
-           $subject= "【重要】【サポートカフェ】プレミアム代理店決済登録確認完了のお知らせ";
+           $subject= "【重要】【サポートイベント】プレミアム代理店決済登録確認完了のお知らせ";
            $agenciesMsg01 = MailConstant::PREMIUM_AGENCIES_MEMBER_MAIL01;
            $agenciesMsg02 = MailConstant::PREMIUM_AGENCIES_MEMBER_MAIL02;
            $message = $agenciesMsg01 . $each_member_contents . $agenciesMsg02;
@@ -137,6 +165,55 @@ class AutoRegistration {
          $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
          wp_mail($email, $subject, $all_message, $headers);
     }
+
+
+    /**
+     * 初回決済エラーのお知らせメール
+     *
+     * @return void
+     */
+     public function _sendPaymentErrMail($email, $member_info) {
+         // XX様
+         $head_name = $member_info['kanji'] . " 様<br>";
+
+         // タイトル
+         $subject = "【重要】【サポートイベント】クレジットカードご決済エラーのお知らせ";
+
+         // 本文
+         $message = mailConstant::INIT_PAYMENT_ERR_MSG;
+
+         // 全文
+         $all_message = $head_name . $message;
+
+         // ヘッダー
+         $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
+         wp_mail($email, $subject, $all_message, $headers);
+     }
+
+
+     /**
+      * 初回メールアドレスエラーのお知らせメール
+      *
+      * @return void
+      */
+      public function _sendErrEmailRegistration($email, $member_info) {
+          // XX様
+          $head_name = "会員様<br>";
+
+          // タイトル
+          $subject = "【重要】【サポートイベント】メールアドレスご登録エラーのお知らせ";
+
+          // 本文
+          $message = mailConstant::ERR_EMAIL_REGISTRATION_MSG;
+
+          // 全文
+          $all_message = $head_name . $message;
+error_log(print_r("aaaaaaaaaaaao", true)."\n", 3, "/tmp/auto-registration.log");
+          // ヘッダー
+          $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
+          wp_mail($email, $subject, $all_message, $headers);
+      }
+
 
     /**
      * 会員レベル毎に、会員登録完了メールに表示する内容を変更
@@ -152,7 +229,7 @@ class AutoRegistration {
                 <br>ログインID: {$member_info['login_id']}
                 <br>メールアドレス: {$email}
                 <br>電話番号: {$member_info['tel']}
-                <br>氏名（漢字）: {$member_info['kanji']}
+                <br>氏名(漢字): {$member_info['kanji']}
                 <br>氏名(かな）: {$member_info['kana']}
                 <br>紹介者コード（紹介者の会員ID）: {$member_info['introducer_id']}";
 
@@ -219,7 +296,9 @@ class AutoRegistration {
             $member_table = $this->tablePrefix."swpm_members_tbl";
             $upd_result = $this->wpdb->update($member_table,
                                               array('membership_level' => $unpaid_member_level,
-                                                    'account_state' => 'inactive'),
+                                                    'account_state' => 'inactive',
+                                                    'payment_err_date' => current_time('mysql', 1)
+                                                   ),
                                               array('email' => $email),
                                               array('%s', '%s')
                                              );
@@ -248,12 +327,23 @@ class AutoRegistration {
             }
 
             // 会員レベルが未決済の状態なら、決済会員レベルに復活
-            $ins_result = $this->_updateMembershipLevel($email, $member);
-            if (false === $ins_result) {
+            $upd_result = $this->_updateMembershipLevel($email, $member);
+            if (false === $upd_result) {
               return;
             }
         }
     }
+
+
+    /**
+     * 決済成功判定
+     *
+     * @return boolean
+     */
+    private function _isPaymentSucceed($is_telecom_access) {
+        return $is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && isset($_GET['money']) && $_GET['rel'] == 'yes';
+    }
+
 
     /**
      * 継続決済成功判定
@@ -261,8 +351,11 @@ class AutoRegistration {
      * @return boolean
      */
     private function _isPaymentError($is_telecom_access) {
-        return $is_telecom_access && isset($_GET['email']) && isset($_GET['rel']) && $_GET['rel'] == 'no';
+      if ($rel == 'no') return true;
+      if (!isset($email) || !isset($money)) return true;
+      return false;
     }
+
 
     /**
      * IPアドレスNG通知
@@ -290,6 +383,18 @@ class AutoRegistration {
         }
         $this->_sendSlackMsg($text);
     }
+
+
+    /**
+     * 初回決済NG通知
+     *
+     * @return void
+     */
+    private function _initPaymentErr($email, $err_reason) {
+        $text = 'TEST 初回決済処理エラー:' .  $err_reason . ' user_mail:' . $email;
+        $this->_sendSlackMsg($text);
+    }
+
 
     /**
      * Slack Web API
@@ -326,6 +431,9 @@ class AutoRegistration {
         if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_FEE; // 5000
         if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_FEE; // 8000
         if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE; // 8000
+        if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER_WEST) return Constant::PREMIUM_MEMBER_FEE_WEST; // 2000
+        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_WEST) return Constant::PREMIUM_AGENCY_FEE_WEST; // 4000
+        if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER_WEST) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE_WEST; // 4000
         return null;
     }
 
@@ -384,7 +492,7 @@ class AutoRegistration {
 
 
     /**
-     * 継続決済実行日をUpdate
+     * 決済実行日をUpdate
      *
      * @return int
      */
@@ -404,6 +512,29 @@ class AutoRegistration {
 
         return $upd_result;
     }
+
+    // TODO リファクタリング予定
+    // /**
+    //  * 決済失敗日をUpdate
+    //  *
+    //  * @return int
+    //  */
+    // private function _updatePaymentErrDate($email, $member_info) {
+    //
+    //     if (!array_key_exists('payment_date', $member_info) || !array_key_exists('account_state', $member_info)) {
+    //       return;
+    //     }
+    //     // 決済日とアカウントステータスを更新
+    //     $member_table = $this->tablePrefix."swpm_members_tbl";
+    //     $upd_result = $this->wpdb->update($member_table,
+    //                                       array('payment_date' => current_time('mysql', 1),
+    //                                             'account_state' => 'active'),
+    //                                       array('email' => $email),
+    //                                       array('%s', '%s')
+    //                                      );
+    //
+    //     return $upd_result;
+    // }
 
 
     /**
@@ -451,15 +582,21 @@ class AutoRegistration {
      */
     private function _getRewardPrice($level) {
       switch ($level) {
+        // 関東
         case Constant::PREMIUM_MEMBER_LEVEL:
           return Constant::PREMIUM_MEMBER_INTRODUCE_FEE; // 2000
         case Constant::PREMIUM_AGENCY_LEVEL:
           return Constant::PREMIUM_AGENCY_INTRODUCE_FEE; // 4000
         case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL:
-          return Constant::PREMIUM_AGENCY_INTRODUCE_FEE; // 4000
+          return Constant::PREMIUM_AGENCY_ORGANIZER_INTRODUCE_FEE; // 4000
+        // 関西
+        case Constant::PREMIUM_AGENCY_LEVEL_WEST:
+          return Constant::PREMIUM_AGENCY_INTRODUCE_FEE_WEST; // 1000
+        case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL_WEST:
+          return Constant::PREMIUM_AGENCY_ORGANIZER_INTRODUCE_FEE_WEST; // 2000
         default:
           return null;
-        }
+      }
     }
 
     /**
@@ -474,6 +611,7 @@ class AutoRegistration {
         SELECT
           {$memberTable}.member_id AS member_id,
           introducerTable.member_id AS introducer_id,
+          introducerTable.membership_level AS introducer_level,
           {$memberTable}.membership_level AS level,
           {$memberTable}.user_name AS login_id,
           {$memberTable}.phone AS tel,
