@@ -46,8 +46,8 @@ class Confirm
      */
     private function setParam()
     {
-        $this->nonce = $_POST['nonce'];
-        $this->price = $_POST['price'];
+        $this->nonce = isset($_POST['nonce']) ? $_POST['nonce'] : '';
+        $this->price = isset($_POST['price']) ? $_POST['price'] : '';
     }
     
     /**
