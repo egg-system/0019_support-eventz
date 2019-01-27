@@ -2,10 +2,8 @@
 namespace AutoReg;
 
 use AutoReg\Constant as Constant;
-use AutoReg\Dao as Dao;
 
 require_once(__DIR__ . "/../constant.php");
-require_once(__DIR__ . "/dao.php");
 
 class AutoRegLog {
 
@@ -25,26 +23,27 @@ class AutoRegLog {
    *
    * @return void
    */
-  public static function msgPaymentErrLog($paymentType, $level, $email, $rel, $ipAddr) {
-      $msgParams = $email . " 会員レベル:" . $level . " 結果可否(rel):" . $rel . " IPアドレス" . $ipAddr;
+  public static function msgPaymentErrLog($paymentType, $memberInfo, $email, $money, $rel, $ipAddr) {
+      $msgParams = $email . " 会員情報:" . var_export($memberInfo , true). " 月額:" . $money . " 結果可否(rel):" . $rel . " IPアドレス:" . $ipAddr;
       $text = "";
+      $env = 'TEST';
       if ($paymentType == Constant::CONTINUE_PAY) {
-        $text = 'TEST 継続決済でNG : user_mail ' . $msgParams;
+        $text = $env . ' [WARN]継続決済でNG : user_mail ' . $msgParams;
       } else {
-        $text = 'TEST 初回決済でNG : user_mail ' . $msgParams;
+        $text = $env . ' [WARN]初回決済でNG : user_mail ' . $msgParams;
       }
       self::_sendSlackMsg($text);
   }
 
 
   /**
-   * 初回決済NG通知
+   * DAO決済NG通知
    *
    * @return void
    */
-  public static function initPaymentErrLog($email, $errReason) {
-      $text = 'TEST 初回決済処理エラー:' .  $errReason . ' user_mail:' . $email;
-      self::_sendSlackMsg($text);
+  public static function msgDaoErrLog($email, $memberInfo, $errReason) {
+    $text = self::getParamsMsg($email, $memberInfo, $errReason);
+    self::_sendSlackMsg($text);
   }
 
 
@@ -54,8 +53,38 @@ class AutoRegLog {
    * @return void
    */
   public static function msgIpErrLog($email, $ipAddr) {
-      $text = "IPアドレスエラー:" . $ipAddr . " user_mail:" . $email;
+      $text = "[WARN]IPアドレスエラー:" . $ipAddr . " user_mail:" . $email;
       self::_sendSlackMsg($text);
+  }
+
+
+  /**
+   * 決済成功
+   *
+   * @return void
+   */
+  public static function msgPaymentSucceedLog($email, $memberInfo, $msg) {
+      $text = self::getParamsMsg($email, $memberInfo, $msg);
+      self::_sendSlackMsg($text);
+  }
+
+
+   /**
+   * Slack Web API
+   *
+   * @return void
+   */
+  private static function getParamsMsg($email, $memberInfo, $msg) {
+    $name = $memberInfo['kanji'] . ' ' . $memberInfo['kana'];
+    $member_id = $memberInfo['member_id'];
+    $level = $memberInfo['level'];
+    $account_state = $memberInfo['account_state'];
+    $payment_date = $memberInfo['payment_date'];
+    $introducer_id = $memberInfo['introducer_id'];
+    $introducer_level = $memberInfo['introducer_level'];
+    $env = 'TEST';
+    $text = $env . ' ' . $msg . ': member_id:' . $member_id . ' ,email:' . $email . ' ,level:' .$level . ' ,name:' . $name . ' ,state:' . $account_state . ' ,date:' . $payment_date . ' ,introducer_id:' . $introducer_id . ' ,introducer_level:' . $introducer_level;
+    return $text;
   }
 
 
@@ -64,7 +93,7 @@ class AutoRegLog {
    *
    * @return void
    */
-  private function _sendSlackMsg($msg) {
+  private static function _sendSlackMsg($msg) {
       // bot
       $slackApiKey = Constant::BOT_TOKEN;
       $text = urlencode($msg);

@@ -23,8 +23,8 @@ function after_registration_func($form_data) {
  */
 add_shortcode('receive_telecom_result', 'receive_telecom_result_func');
 function receive_telecom_result_func() {
-    global $wpdb, $tablePrefix;
-    $receiveTelecomResultController = new AutoReg\Controller($wpdb, $tablePrefix);
+    global $wpdb, $table_prefix;
+    $receiveTelecomResultController = new AutoReg\Controller($wpdb, $table_prefix);
     $receiveTelecomResultController->receive_telecom_result();
 }
 
@@ -34,8 +34,8 @@ function receive_telecom_result_func() {
  */
 add_shortcode('receive_telecom_result_continue', 'receive_telecom_result_continue_func');
 function receive_telecom_result_continue_func() {
-    global $wpdb, $tablePrefix;
-    $receiveTelecomResultContinueController = new AutoReg\Controller($wpdb, $tablePrefix);
+    global $wpdb, $table_prefix;
+    $receiveTelecomResultContinueController = new AutoReg\Controller($wpdb, $table_prefix);
     $receiveTelecomResultContinueController->receive_telecom_result_continue();
 }
 

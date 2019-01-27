@@ -20,20 +20,32 @@ class Mail {
        $headName = $memberInfo['kanji'] . " 様<br>";
 
        // 会員レベル毎に異なる表示内容を取得
-       $eachMemberContents = $this->_getEachMemberLevelMsg($memberInfo);
+       $eachMemberContents = self::getEachMemberLevelMsg($email, $memberInfo);
 
        // 会員レベル毎の文面
        $subject = ""; // 件名
        $message = "";
-       if ($memberInfo['level'] == Constant::UNPAID_PREMIUM_MEMBER) {
+       if ($memberInfo['level'] == Constant::PREMIUM_MEMBER_LEVEL) {
          // プレミアム会員
-         $subject = "【重要】【サポートイベント】プレミアム会員決済登録確認完了のお知らせ";
+         $subject = "【重要】【サポートイベント】プレミアム会員 決済登録確認完了のお知らせ";
          $premiumMsg01 = MailConstant::PREMIUM_MEMBER_MAIL01;
          $premiumMsg02 = MailConstant::PREMIUM_MEMBER_MAIL02;
          $message = $premiumMsg01 . $eachMemberContents . $premiumMsg02;
-       } else {
+       } else if($memberInfo['level'] == Constant::PREMIUM_MEMBER_LEVEL_WEST) {
+         // プレミアム関西会員
+         $subject = "【重要】【サポートイベント】プレミアム関西会員 決済登録確認完了のお知らせ";
+         $premiumMsg01 = MailConstant::PREMIUM_MEMBER_MAIL01;
+         $premiumMsg02 = MailConstant::PREMIUM_MEMBER_MAIL02;
+         $message = $premiumMsg01 . $eachMemberContents . $premiumMsg02;
+       } else if($memberInfo['level'] == Constant::PREMIUM_AGENCY_LEVEL || $memberInfo['level'] == Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL) {
          // プレミアム代理店会員、代理店&主催会員
-         $subject= "【重要】【サポートイベント】プレミアム代理店決済登録確認完了のお知らせ";
+         $subject= "【重要】【サポートイベント】プレミアム代理店会員 決済登録確認完了のお知らせ";
+         $agenciesMsg01 = MailConstant::PREMIUM_AGENCIES_MEMBER_MAIL01;
+         $agenciesMsg02 = MailConstant::PREMIUM_AGENCIES_MEMBER_MAIL02;
+         $message = $agenciesMsg01 . $eachMemberContents . $agenciesMsg02;
+       } else {
+         // プレミアム代理店関西会員、代理店&主催関西会員
+         $subject= "【重要】【サポートイベント】プレミアム代理店関西会員 決済登録確認完了のお知らせ";
          $agenciesMsg01 = MailConstant::PREMIUM_AGENCIES_MEMBER_MAIL01;
          $agenciesMsg02 = MailConstant::PREMIUM_AGENCIES_MEMBER_MAIL02;
          $message = $agenciesMsg01 . $eachMemberContents . $agenciesMsg02;
@@ -65,7 +77,7 @@ class Mail {
 
        // 全文
        $allMessage = $headName . $message;
-// error_log(print_r("aaaaaaaaaaaao", true)."\n", 3, "/tmp/auto-registration.log");
+
        // ヘッダー
        $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
        wp_mail($email, $subject, $allMessage, $headers);
@@ -101,7 +113,7 @@ class Mail {
      *
      * @return String
      */
-    private function _getEachMemberLevelMsg($email, $memberInfo) {
+    private static function getEachMemberLevelMsg($email, $memberInfo) {
         // 会員情報
         $commonMsg = "<br>=========================
                 <br>　　会員情報
@@ -116,23 +128,44 @@ class Mail {
 
         $msg = "";
         switch($memberInfo['level']) {
-        case Constant::UNPAID_PREMIUM_MEMBER:
+        case Constant::PREMIUM_MEMBER_LEVEL:
             $msg = "<br>利用規約 (https://support.eventz.jp/kiyaku/) に同意しました
                     <br>会員レベル: プレミアム会員
                     <br>=========================
                     <br>
                     <br>";
             break;
-        case Constant::UNPAID_PREMIUM_AGENCY:
+        case Constant::PREMIUM_AGENCY_LEVEL:
             $msg = "<br>利用規約 (https://support.eventz.jp/kiyaku/) に同意しました
                     <br>会員レベル: プレミアム代理店会員
                     <br>=========================
                     <br>
                     <br>";
             break;
-        case Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER:
+        case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL:
             $msg = "<br>主催者利用規約 ( https://support.eventz.jp/syusai-kiyaku ) に同意しました
                     <br>会員レベル: プレミアム代理店会員&主催
+                    <br>=========================
+                    <br>
+                    <br>";
+            break;
+        case Constant::PREMIUM_MEMBER_LEVEL_WEST:
+            $msg = "<br>利用規約 (https://support.eventz.jp/kiyaku/) に同意しました
+                    <br>会員レベル: プレミアム関西会員
+                    <br>=========================
+                    <br>
+                    <br>";
+            break;
+        case Constant::PREMIUM_AGENCY_LEVEL_WEST:
+            $msg = "<br>利用規約 (https://support.eventz.jp/kiyaku/) に同意しました
+                    <br>会員レベル: プレミアム代理店関西会員
+                    <br>=========================
+                    <br>
+                    <br>";
+            break;
+        case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL_WEST:
+            $msg = "<br>主催者利用規約 ( https://support.eventz.jp/syusai-kiyaku ) に同意しました
+                    <br>会員レベル: プレミアム代理店関西会員&主催
                     <br>=========================
                     <br>
                     <br>";
@@ -143,7 +176,6 @@ class Mail {
 
         return $commonMsg . $msg;
     }
-
 
 } // end of class
 

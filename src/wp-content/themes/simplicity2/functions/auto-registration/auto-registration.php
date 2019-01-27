@@ -208,7 +208,7 @@ class AutoRegistration {
 
           // 全文
           $all_message = $head_name . $message;
-error_log(print_r("aaaaaaaaaaaao", true)."\n", 3, "/tmp/auto-registration.log");
+
           // ヘッダー
           $headers = ['From: サポートイベント <cafesuppo@gmail.com>', 'Content-Type: text/html; charset=UTF-8',];
           wp_mail($email, $subject, $all_message, $headers);
@@ -447,6 +447,15 @@ error_log(print_r("aaaaaaaaaaaao", true)."\n", 3, "/tmp/auto-registration.log");
         if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_LEVEL;
         if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_LEVEL;
         if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL;
+
+        // (継続決済用)決済会員の場合はそのレベルをそのまま返す
+        if ($memberLevel == Constant::PREMIUM_MEMBER_LEVEL) return $memberLevel;
+        if ($memberLevel == Constant::PREMIUM_AGENCY_LEVEL) return $memberLevel;
+        if ($memberLevel == Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL) return $memberLevel;
+        if ($memberLevel == Constant::PREMIUM_MEMBER_LEVEL_WEST) return $memberLevel;
+        if ($memberLevel == Constant::PREMIUM_AGENCY_LEVEL_WEST) return $memberLevel;
+        if ($memberLevel == Constant::PREMIUM_AGENCY_LEVEL_ORGANIZER_WEST) return $memberLevel;
+  
         return null;
     }
 

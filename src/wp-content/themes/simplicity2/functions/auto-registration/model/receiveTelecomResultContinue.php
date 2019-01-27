@@ -62,36 +62,37 @@ class ReceiveTelecomResultContinue {
     // 会員取得
     $memberInfo = $this->dao->getMember($this->email);
     if ($this->_isPaymentSucceed($isTelecomAccess)) {
-
-      // 報酬テーブルに登録
-      $insResult = $this->dao->insertIntroducedReward($this->email, $memberInfo);
-      if (false === $insResult) {
+      // 会員レベルが未決済の状態なら、決済会員レベルに復活
+      $updResult = $this->dao->updateMembershipLevel($this->email, $memberInfo);
+      if (false === $updResult) {
+        AutoRegLog::msgDaoErrLog($this->email, $memberInfo, "[ERROR]継続決済：会員レベル復活失敗");
         return;
       }
+
+      // 報酬テーブルに登録
+      $memberInfo = $this->dao->insertIntroducedReward($this->email);
 
       // 継続決済実行日を登録
       $updResult = $this->dao->updatePaymentDate($this->email, $memberInfo);
       if (false === $updResult) {
+        AutoRegLog::msgDaoErrLog($this->email, $memberInfo, "[INFO]継続決済：実行日更新失敗");
         return;
       }
 
-      // 会員レベルが未決済の状態なら、決済会員レベルに復活
-      $updResult = $this->dao->updateMembershipLevel($this->email, $memberInfo);
-      if (false === $updResult) {
-        return;
-      }
+      // 継続決済成功通知
+      AutoRegLog::msgPaymentSucceedLog($this->email, $memberInfo, "[INFO]継続決済処理成功");
 
     // 継続決済失敗時の処理
     } else {
 
       // Slack API 通知
-      AutoRegLog::msgPaymentErrLog(Constant::CONTINUE_PAY, $memberInfo['level'], $this->email, $this->rel, $this->ipAddr);
+      AutoRegLog::msgPaymentErrLog(Constant::CONTINUE_PAY, $memberInfo, $this->email, $this->money, $this->rel, $this->ipAddr);
       if (!array_key_exists('level', $memberInfo) || is_null($memberInfo['level'])) {
-         return;
+        return;
       }
 
-      // 会員レベルを未決に戻し、stateをinactiveにする
-      $updResult = $this->dao->updateMembershipLevelReturns($this->email, $memberInfo)
+      // 会員レベルを未決済に戻し、stateをinactiveにする
+      $updResult = $this->dao->updateMembershipLevelToUnpaid($this->email, $memberInfo);
       if (false === $updResult) {
         return;
       }

@@ -23,10 +23,12 @@ class AutoRegUtils {
    */
   public static function getMemberFee($memberLevel) {
       // 5,6,7のいずれかの場合
+      // 関東
       if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER) return Constant::PREMIUM_MEMBER_FEE; // 5000
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY) return Constant::PREMIUM_AGENCY_FEE; // 8000
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE; // 8000
       // 11,12,13のいずれかの場合、14,15,16
+      // 関西
       if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER_WEST) return Constant::PREMIUM_MEMBER_FEE_WEST; // 2000
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_WEST) return Constant::PREMIUM_AGENCY_FEE_WEST; // 4000
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER_WEST) return Constant::PREMIUM_AGENCY_ORGANIZER_FEE_WEST; // 4000
@@ -50,6 +52,15 @@ class AutoRegUtils {
       if ($memberLevel == Constant::UNPAID_PREMIUM_MEMBER_WEST) return Constant::PREMIUM_MEMBER_LEVEL_WEST;
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_WEST) return Constant::PREMIUM_AGENCY_LEVEL_WEST;
       if ($memberLevel == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER_WEST) return Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL_WEST;
+
+      // (継続決済用)決済会員の場合はそのレベルをそのまま返す
+      if ($memberLevel == Constant::PREMIUM_MEMBER_LEVEL) return $memberLevel;
+      if ($memberLevel == Constant::PREMIUM_AGENCY_LEVEL) return $memberLevel;
+      if ($memberLevel == Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL) return $memberLevel;
+      if ($memberLevel == Constant::PREMIUM_MEMBER_LEVEL_WEST) return $memberLevel;
+      if ($memberLevel == Constant::PREMIUM_AGENCY_LEVEL_WEST) return $memberLevel;
+      if ($memberLevel == Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL_WEST) return $memberLevel;
+
       return null;
   }
 
@@ -60,8 +71,14 @@ class AutoRegUtils {
    * @return int
    */
   public static function getUnpaidMemberLevel($level) {
-      // 2回以上決済失敗の場合は5,6,7のいずれかとなる為、そのまま返す
-      if ($level <= Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return $level;
+      // 2回以上決済失敗の場合は5,6,7 or 11,12,13のいずれかとなる為、そのまま返す
+      if ($level == Constant::UNPAID_PREMIUM_MEMBER) return $level;
+      if ($level == Constant::UNPAID_PREMIUM_AGENCY) return $level;
+      if ($level == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER) return $level;
+      if ($level == Constant::UNPAID_PREMIUM_MEMBER_WEST) return $level;
+      if ($level == Constant::UNPAID_PREMIUM_AGENCY_WEST) return $level;
+      if ($level == Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER_WEST) return $level;
+
       // 8,9,10いずれかの場合、5,6,7を返す
       // 関東
       if ($level == Constant::PREMIUM_MEMBER_LEVEL) return Constant::UNPAID_PREMIUM_MEMBER;

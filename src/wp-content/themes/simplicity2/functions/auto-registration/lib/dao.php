@@ -3,6 +3,7 @@ namespace AutoReg;
 
 use AutoReg\Constant as Constant;
 use AutoReg\AutoRegUtils as AutoRegUtils;
+use AutoReg\AutoRegLog as AutoRegLog;
 
 class Dao{
 
@@ -20,6 +21,8 @@ class Dao{
   public function __construct($wpdb, $tablePrefix) {
       $this->wpdb = $wpdb;
       $this->tablePrefix = $tablePrefix;
+
+      date_default_timezone_set('Asia/Tokyo');
   }
 
   /**
@@ -93,16 +96,18 @@ class Dao{
 
       // 会員レベルの取得
       $membershipLevel = AutoRegUtils::getMemberLevel($membersInfo['level']);
+
       // 会員レベルの取得が出来ていない場合処理なし
       if (is_null($membershipLevel)) {
-        return;
+        AutoRegLog::msgDaoErrLog($email,  $memberInfo, "[WARN]会員レベルUpdateエラー：会員レベルが取得できません");
+        return false;
       }
 
       // フォームにて入力された分のレコードの会員レベル更新
       $membersTable = $this->tablePrefix . Constant::MEMBERS_TABLE;
       $updResult = $this->wpdb->update($membersTable, array('membership_level' => $membershipLevel), array('email' => $email));
       if (false === $updResult) {
-        return;
+        return false;
       }
 
       return $updResult;
@@ -136,17 +141,27 @@ class Dao{
    *
    * @return int
    */
-  public function insertIntroducedReward($email, $memberInfo) {
+  public function insertIntroducedReward($email) {
+
+      $memberInfo = $this->getMember($email);
+
+      // プレミアム会員は、紹介者報酬は発生しない
+      if($memberInfo['introducer_level'] == Constant::PREMIUM_MEMBER_LEVEL || $memberInfo['introducer_level'] == Constant::PREMIUM_MEMBER_LEVEL_WEST) {
+        AutoRegLog::msgDaoErrLog($email, $memberInfo, "[INFO]紹介者の会員レベルがプレミアムです。報酬は発生しません。");
+        return false;
+      }
 
       // 紹介者IDが取得できない場合、
       if (!array_key_exists('introducer_id', $memberInfo) || is_null($memberInfo['introducer_id'])) {
-        return;
+        AutoRegLog::msgDaoErrLog($email, $memberInfo, "[WARN]報酬登録エラー：紹介者IDが取得できません。報酬は発生しません。");
+        return false;
       }
 
       // 報酬がない場合も処理なし
       $rewardPrice = AutoRegUtils::getRewardPrice($memberInfo['level']);
       if (is_null($rewardPrice)) {
-        return;
+        AutoRegLog::msgDaoErrLog($email,  $memberInfo, "[WARN]報酬が発生しない会員レベルです");
+        return false;
       }
 
       // 必要なテーブルの定義
@@ -165,8 +180,12 @@ class Dao{
                  '%d',
                  '%d'];
       $results = $this->wpdb->insert($rewardTable, $data, $format);
+      if (false === $results) {
+        AutoRegLog::msgDaoErrLog($email, $memberInfo, "[ERROR]クエリ実行エラー：" . __FUNCTION__ );
+        return false;
+      }
 
-      return $results;
+      return $memberInfo;
   }
 
 
@@ -175,7 +194,7 @@ class Dao{
    *
    * @return int
    */
-  public function updateMembershipLevelReturns($email, $memberInfo) {
+  public function updateMembershipLevelToUnpaid($email, $memberInfo) {
 
     // 未決済会員レベル取得
     $unpaidMemberLevel = AutoRegUtils::getUnpaidMemberLevel($memberInfo['level']);
