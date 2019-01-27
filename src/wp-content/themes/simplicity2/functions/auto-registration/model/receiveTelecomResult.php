@@ -58,7 +58,6 @@ class ReceiveTelecomResult{
 
     //IPアドレスでテレコムからのアクセスであることを確認
     $isTelecomAccess = AutoRegUtils::isTelecomIpAccessed($this->ipAddr);
-    $isTelecomAccess = true;
     if (!$isTelecomAccess) {
       echo('不正なアクセスです。');
       // Slackへ通知

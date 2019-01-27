@@ -107,8 +107,7 @@ class Constant
   // 継続決済
   const CONTINUE_PAY = 2;
   // bot token
-  //const BOT_TOKEN = 'xoxb-253968019206-465508768417-WPPOmWSd8lrZnTbEVrujmV1l';
-  const BOT_TOKEN = 'xoxb-253968019206-465508768417-zJTzLJUTbkrBbaU0FiY8rGws';
+  const BOT_TOKEN = 'xoxb-253968019206-465508768417-VnGXrWwcKlyWcrCf0fNZWkaP';
 
   // テーブル名
   const REWARD_TABLE = "reward_details";
