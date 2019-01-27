@@ -23,6 +23,15 @@ function enqueue_mypage_scripts() {
 
 add_action('wp_enqueue_scripts', 'enqueue_mypage_scripts');
 
+
+/**
+ * マイページ会員情報表示コンポーネント
+ */
+function inform_member_primary_info() {
+	get_template_part('functions/mypage-reward/view/member-primary-info');
+}
+add_shortcode('memberinfo', 'inform_member_primary_info');
+
 /**
  * マイページ報酬詳細画面
  */
