@@ -1,6 +1,8 @@
 <?php
+// namespace AutoReg;
+
 require_once(__DIR__ . '/controller.php');
-require_once(__DIR__ . '/auto-registration.php');
+//require_once(__DIR__ . '/model/afterRegistration.php');
 
 /**
  *  * 会員自動登録
@@ -9,7 +11,7 @@ require_once(__DIR__ . '/auto-registration.php');
 add_action('swpm_front_end_registration_complete_fb', 'after_registration_func');
 function after_registration_func($form_data) {
     global $wpdb, $table_prefix;
-    $autoRegistration = new AutoReg\AutoRegistration($wpdb, $table_prefix);
+    $autoRegistration = new AutoReg\Controller($wpdb, $table_prefix);
     $autoRegistration->after_registration($form_data);
 
     // global $wpdb, $tablePrefix;

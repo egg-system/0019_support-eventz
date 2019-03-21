@@ -26,7 +26,7 @@ class AutoRegLog {
   public static function msgPaymentErrLog($paymentType, $memberInfo, $email, $money, $rel, $ipAddr) {
       $msgParams = $email . " 会員情報:" . var_export($memberInfo , true). " 月額:" . $money . " 結果可否(rel):" . $rel . " IPアドレス:" . $ipAddr;
       $text = "";
-      $env = 'TEST';
+      $env = '本番';
       if ($paymentType == Constant::CONTINUE_PAY) {
         $text = $env . ' [WARN]継続決済でNG : user_mail ' . $msgParams;
       } else {
@@ -82,7 +82,7 @@ class AutoRegLog {
     $payment_date = $memberInfo['payment_date'];
     $introducer_id = $memberInfo['introducer_id'];
     $introducer_level = $memberInfo['introducer_level'];
-    $env = 'TEST';
+    $env = '本番';
     $text = $env . ' ' . $msg . ': member_id:' . $member_id . ' ,email:' . $email . ' ,level:' .$level . ' ,name:' . $name . ' ,state:' . $account_state . ' ,date:' . $payment_date . ' ,introducer_id:' . $introducer_id . ' ,introducer_level:' . $introducer_level;
     return $text;
   }

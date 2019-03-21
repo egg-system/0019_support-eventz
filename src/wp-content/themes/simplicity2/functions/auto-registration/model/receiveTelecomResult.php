@@ -31,6 +31,7 @@ class ReceiveTelecomResult{
   public $rel = "";
   public $ipAddr = "";
 
+  private $dir = __DIR__;
 
   /**
    * コンストラクタ
@@ -58,6 +59,7 @@ class ReceiveTelecomResult{
 
     //IPアドレスでテレコムからのアクセスであることを確認
     $isTelecomAccess = AutoRegUtils::isTelecomIpAccessed($this->ipAddr);
+  // $isTelecomAccess = true;
     if (!$isTelecomAccess) {
       echo('不正なアクセスです。');
       // Slackへ通知
@@ -92,10 +94,15 @@ class ReceiveTelecomResult{
          return;
       }
 
+      // ログ
+      error_log(print_r("---初回決済OK---:".date("Y-m-d H:i:s"), true)."\n", 3, "{$this->dir}/../log/init_payment.log");
+      error_log(print_r("email:" . $this->email, true)."\n", 3, "{$this->dir}/../log/init_payment.log");
+      error_log(print_r($memberInfo, true)."\n", 3, "{$this->dir}/../log/init_payment.log");
+
       // 初回決済完了メール
+      $memberInfo = $this->dao->getMember($this->email);
       Mail::sendInitPaymentMail($this->email, $memberInfo);
       echo('決済認証成功');
-
       // 初回決済成功通知
       AutoRegLog::msgPaymentSucceedLog($this->email, $memberInfo, "[INFO]初回決済処理成功");
 
@@ -105,6 +112,11 @@ class ReceiveTelecomResult{
       // Slackへの通知
       $memberInfo = $this->dao->getMember($this->email);
       if (isset($this->email)) AutoRegLog::msgPaymentErrLog(Constant::FIRST_PAY, $memberInfo['level'], $this->email, $this->money, $this->rel, $this->ipAddr);
+
+      // ログ
+      error_log(print_r("---初回決済NG---:".date("Y-m-d H:i:s"), true)."\n", 3, "{$this->dir}/../log/init_payment.log");
+      error_log(print_r("email:" . $this->email, true)."\n", 3, "{$this->dir}/../log/init_payment.log");
+      error_log(print_r($memberInfo, true)."\n", 3, "{$this->dir}/../log/init_payment.log");
 
       // 初回決済エラーのお知らせメール
       Mail::sendPaymentErrMail($this->email, $memberInfo);

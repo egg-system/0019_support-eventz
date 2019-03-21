@@ -145,7 +145,7 @@ class Dao{
 
       $memberInfo = $this->getMember($email);
 
-      // プレミアム会員は、紹介者報酬は発生しない
+      // 紹介者がプレミアム会員の場合、報酬は発生しない
       if($memberInfo['introducer_level'] == Constant::PREMIUM_MEMBER_LEVEL || $memberInfo['introducer_level'] == Constant::PREMIUM_MEMBER_LEVEL_WEST) {
         AutoRegLog::msgDaoErrLog($email, $memberInfo, "[INFO]紹介者の会員レベルがプレミアムです。報酬は発生しません。");
         return false;
@@ -157,7 +157,7 @@ class Dao{
         return false;
       }
 
-      // 報酬がない場合も処理なし
+      // 被紹介者の会員レベル毎に報酬額取得。報酬がない場合処理なし
       $rewardPrice = AutoRegUtils::getRewardPrice($memberInfo['level']);
       if (is_null($rewardPrice)) {
         AutoRegLog::msgDaoErrLog($email,  $memberInfo, "[WARN]報酬が発生しない会員レベルです");
@@ -167,11 +167,11 @@ class Dao{
       // 必要なテーブルの定義
       $rewardTable = $this->tablePrefix . Constant::REWARD_TABLE;
       // 報酬詳細テーブルはmember_idとintroducer_idが逆となる
-      // 例)456さんが123さんを紹介した場合：member_id:456、introducer_id:123
-      $data = ['member_id' => $memberInfo['introducer_id'], // 123
-               'introducer_id' => $memberInfo['member_id'], // 456
+      // 例)456さん(紹介者)、123さん(被紹介者)の場合：member_id:456、introducer_id:123
+      $data = ['member_id' => $memberInfo['introducer_id'],
+               'introducer_id' => $memberInfo['member_id'],
                'date' => current_time('mysql', 1),
-               'level' => $memberInfo['level'],
+               'level' => $memberInfo['level'], // 被紹介者の会員レベル
                'price' => $rewardPrice
                ];
       $format = ['%d',

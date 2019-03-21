@@ -20,6 +20,8 @@ class AfterRegistration{
   // DBからデータを取得するオブジェクト
   private $dao = null;
 
+  private $dir = __DIR__;
+
   /**
    * コンストラクタ
    *
@@ -55,15 +57,19 @@ class AfterRegistration{
          if (empty($email) || empty($tel) || is_null($money)) {
              return;
          }
-
+         
          $redirectUrl = site_url().Constant::REDIRECT_URL;
          $clientIp = (site_url() == Constant::SITE_URL) ? Constant::PRODUCT_CLIENT_IP : Constant::TEST_CLIENT_IP;
 
          // プレミアム代理店&主催の場合、moneyパラメーターへ指定する金額が変化する
          $fee = $this->_getPaymentFee($memberLevel, $money);
-         $paymentUrl = Constant::TEST_URL.$clientIp."&money={$fee}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
-         // $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$clientIp."&money={$fee}&rebill_param_id=1month{$money}yen_end&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+         //$paymentUrl = Constant::TEST_URL.$clientIp."&money={$fee}&rebill_param_id=1day{$money}yen&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
+         $paymentUrl = Constant::TELECOM_CREDIT_FORM_URL.$clientIp."&money={$fee}&rebill_param_id=1month{$money}yen_end&usrmail={$email}&usrtel={$tel}&redirect_back_url={$redirectUrl}";
 
+         // ログ
+         error_log(print_r("---初回登録後処理---:".date("Y-m-d H:i:s"), true)."\n", 3, "{$this->dir}/../log/after-registration_init.log");
+         error_log(print_r($this->formData, true)."\n", 3, "{$this->dir}/../log/after-registration_init.log");
+ 
          header("Location: {$paymentUrl}");
          exit;
       } else {

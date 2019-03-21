@@ -4,8 +4,7 @@ namespace AutoReg;
 use AutoReg\Constant as Constant;
 use AutoReg\MailConstant as MailConstant;
 
-// include_once(__DIR__ . "/constant.php");
-// include_once(__DIR__ . "/lib/dao.php");
+include_once(__DIR__ . "/../mailConstant.php");
 
 class Mail {
 
@@ -18,10 +17,10 @@ class Mail {
 
        // XX様
        $headName = $memberInfo['kanji'] . " 様<br>";
-
+       
        // 会員レベル毎に異なる表示内容を取得
        $eachMemberContents = self::getEachMemberLevelMsg($email, $memberInfo);
-
+       
        // 会員レベル毎の文面
        $subject = ""; // 件名
        $message = "";
@@ -136,7 +135,7 @@ class Mail {
                     <br>";
             break;
         case Constant::PREMIUM_AGENCY_LEVEL:
-            $msg = "<br>利用規約 (https://support.eventz.jp/kiyaku/) に同意しました
+            $msg = "<br>利用規約 (https://support.eventz.jp/syusai-kiyaku/) に同意しました
                     <br>会員レベル: プレミアム代理店会員
                     <br>=========================
                     <br>
@@ -157,7 +156,7 @@ class Mail {
                     <br>";
             break;
         case Constant::PREMIUM_AGENCY_LEVEL_WEST:
-            $msg = "<br>利用規約 (https://support.eventz.jp/kiyaku/) に同意しました
+            $msg = "<br>利用規約 (https://support.eventz.jp/syusai-kiyaku/) に同意しました
                     <br>会員レベル: プレミアム代理店関西会員
                     <br>=========================
                     <br>
