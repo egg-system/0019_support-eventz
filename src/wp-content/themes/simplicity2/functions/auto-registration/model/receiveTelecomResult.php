@@ -99,6 +99,9 @@ class ReceiveTelecomResult{
       error_log(print_r("email:" . $this->email, true)."\n", 3, "{$this->dir}/../log/init_payment.log");
       error_log(print_r($memberInfo, true)."\n", 3, "{$this->dir}/../log/init_payment.log");
 
+      // CSV出力
+      AutoRegLog::outputMemberInfoCSV("{$this->dir}/../log/csv_payment_log.csv", $memberInfo, "初回決済OK", false);
+
       // 初回決済完了メール
       $memberInfo = $this->dao->getMember($this->email);
       Mail::sendInitPaymentMail($this->email, $memberInfo);
@@ -117,6 +120,9 @@ class ReceiveTelecomResult{
       error_log(print_r("---初回決済NG---:".date("Y-m-d H:i:s"), true)."\n", 3, "{$this->dir}/../log/init_payment.log");
       error_log(print_r("email:" . $this->email, true)."\n", 3, "{$this->dir}/../log/init_payment.log");
       error_log(print_r($memberInfo, true)."\n", 3, "{$this->dir}/../log/init_payment.log");
+
+      // CSV出力
+      AutoRegLog::outputMemberInfoCSV("{$this->dir}/../log/csv_payment_log.csv", $memberInfo, "初回決済NG", false);
 
       // 初回決済エラーのお知らせメール
       Mail::sendPaymentErrMail($this->email, $memberInfo);

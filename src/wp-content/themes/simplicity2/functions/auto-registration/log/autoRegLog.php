@@ -102,6 +102,87 @@ class AutoRegLog {
       file_get_contents($url);
   }
 
+  /**
+   * CSV出力
+   * @param $csvFileName
+   * @param $outputArray
+   * @param $resultString
+   *
+   * @return
+  */
+  public static function outputMemberInfoCSV($csvFileName, $memberInfo, $resultString, $isContinue) {
+      $outputString = "";
+      // ファイルがまだ生成されていなければ、先頭の文字を入れる
+      $csvFileContents = file_get_contents($csvFileName);
+      if (empty($csvFileContents)) {
+          $outputString .= "会員ID,氏名,紹介者ID,会員レベル,会員レベル(名称),決済結果,決済日(年月日),決済年,決済月,決済日¥n";
+      }
+      // $memberInfo を書き込む
+      {
+          // 継続決済の場合でも現在時刻を入れる
+          if ($isContinue || empty($memberInfo['payment_date'])) {
+              $paymentDate = date("Y-m-d");
+          } else {
+              $tmp = explode(" ", $memberInfo['payment_date']);
+              $paymentDate = $tmp[0];
+          }
+          // 現在時刻 を年、月、日に分解
+          $paymentDateArray = explode("-", $paymentDate);
+          
+          $outputString .= $memberInfo['member_id'] . ",";
+          $outputString .= $memberInfo['kanji'] . ",";
+          $outputString .= $memberInfo['introducer_id'] . ",";
+          $outputString .= $memberInfo['level'] . ",";
+          $outputString .= self::getMemberLevelName($memberInfo['level']) . ",";
+          $outputString .= $resultString . ",";
+          $outputString .= $paymentDate . ",";
+          $outputString .= $paymentDateArray[0] . ",";
+          $outputString .= $paymentDateArray[1] . ",";
+          $outputString .= $paymentDateArray[2];
+          $outputString .= "\r\n";
+      }
+
+      file_put_contents($csvFileName, $outputString, FILE_APPEND | LOCK_EX);
+  }
+    
+  /**
+   * 会員レベル名称の取得
+   * @param $memberLebel
+   *
+   * @return string
+   */
+  public static function getMemberLevelName($memberLebel) {
+      switch ($memberLebel) {
+          // 関東会員レベル
+          case Constant::UNPAID_PREMIUM_MEMBER:
+              return "関東プレミアム会員（決済未済）";
+          case Constant::UNPAID_PREMIUM_AGENCY:
+              return "関東プレミアム代理店会員（決済未済）";
+          case Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER:
+              return "関東プレミアム代理店会員＆主催（決済未済）";
+          case Constant::PREMIUM_MEMBER_LEVEL:
+              return "関東プレミアム会員";
+          case Constant::PREMIUM_AGENCY_LEVEL:
+              return "関東プレミアム代理店会員";
+          case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL:
+              return "関東プレミアム代理店会員＆主催";
+          // 関西会員レベル
+          case Constant::UNPAID_PREMIUM_MEMBER_WEST:
+              return "関西プレミアム会員（決済未済）";
+          case Constant::UNPAID_PREMIUM_AGENCY_WEST:
+              return "関西プレミアム代理店会員（決済未済）";
+          case Constant::UNPAID_PREMIUM_AGENCY_ORGANIZER_WEST:
+              return "関西プレミアム代理店会員＆主催（決済未済）";
+          case Constant::PREMIUM_MEMBER_LEVEL_WEST:
+              return "関西プレミアム会員";
+          case Constant::PREMIUM_AGENCY_LEVEL_WEST:
+              return "関西プレミアム代理店会員";
+          case Constant::PREMIUM_AGENCY_ORGANIZER_LEVEL_WEST:
+              return "関西プレミアム代理店会員＆主催";
+      }
+      return "定義されていないレベル:" . $memberLebel;
+  }
+
 } // end of class
 
 

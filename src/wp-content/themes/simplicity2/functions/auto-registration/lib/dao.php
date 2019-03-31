@@ -40,6 +40,9 @@ class Dao{
       FROM {$membersTable}
       WHERE {$membersTable}.member_id = '{$companyName}'", 'ARRAY_A');
 
+    if (empty($memberIdAry)) {
+        return false;
+    }
     if(!array_key_exists('member_id', $memberIdAry) || is_null($memberIdAry['member_id'])) {
       return false;
     }
@@ -55,7 +58,7 @@ class Dao{
    */
   public function deleteIncorrectUser($email) {
       $membersTable = $this->tablePrefix . Constant::MEMBERS_TABLE;
-      $this->wpdb->delete( $table, array('email' => $email), array('%s'));
+      $this->wpdb->delete( $membersTable, array('email' => $email), array('%s'));
   }
 
 

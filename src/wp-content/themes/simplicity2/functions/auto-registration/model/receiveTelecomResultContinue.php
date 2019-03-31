@@ -74,6 +74,9 @@ class ReceiveTelecomResultContinue {
       error_log(print_r("email:" . $this->email, true)."\n", 3, "{$this->dir}/../log/continue_payment.log");
       error_log(print_r($memberInfo, true)."\n", 3, "{$this->dir}/../log/continue_payment.log");
 
+      // CSV出力
+      AutoRegLog::outputMemberInfoCSV("{$this->dir}/../log/csv_payment_log.csv", $memberInfo, "継続決済OK", true);
+
       // 会員レベルが未決済の状態なら、決済会員レベルに復活
       $updResult = $this->dao->updateMembershipLevel($this->email, $memberInfo);
       if (false === $updResult) {
@@ -102,6 +105,9 @@ class ReceiveTelecomResultContinue {
       error_log(print_r("---継続決済NG---:".date("Y-m-d H:i:s"), true)."\n", 3, "{$this->dir}/../log/continue_payment.log");
       error_log(print_r("email:" . $this->email, true)."\n", 3, "{$this->dir}/../log/continue_payment.log");
       error_log(print_r($memberInfo, true)."\n", 3, "{$this->dir}/../log/continue_payment.log");
+
+      // CSV出力
+      AutoRegLog::outputMemberInfoCSV("{$this->dir}/../log/csv_payment_log.csv", $memberInfo, "継続決済NG", true);
 
       // Slack API 通知
       AutoRegLog::msgPaymentErrLog(Constant::CONTINUE_PAY, $memberInfo, $this->email, $this->money, $this->rel, $this->ipAddr);
