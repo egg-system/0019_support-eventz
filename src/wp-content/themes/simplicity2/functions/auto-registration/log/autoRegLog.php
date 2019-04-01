@@ -115,7 +115,7 @@ class AutoRegLog {
       // ファイルがまだ生成されていなければ、先頭の文字を入れる
       $csvFileContents = file_get_contents($csvFileName);
       if (empty($csvFileContents)) {
-          $outputString .= "会員ID,氏名,紹介者ID,会員レベル,会員レベル(名称),決済結果,決済日(年月日),決済年,決済月,決済日¥n";
+          $outputString .= "会員ID,氏名,紹介者ID,会員レベル,会員レベル(名称),決済結果,決済日(年月日),決済年,決済月,決済日\r\n";
       }
       // $memberInfo を書き込む
       {
