@@ -2,7 +2,6 @@
 namespace Reward\Model;
 
 use Reward\Constant as Constant;
-use Reward\Dao as Dao;
 
 class Detail
 {
@@ -26,13 +25,12 @@ class Detail
     /**
      * コンストラクタ
      *
-     * @param object $wpdb
-     * @param string $tablePrefix
+     * @param object $dao
      * @return void
      */
-    public function __construct($wpdb, $tablePrefix)
+    public function __construct($dao)
     {
-        $this->dao = new Dao($wpdb, $tablePrefix);
+        $this->dao = $dao;
     }
 
     /**
