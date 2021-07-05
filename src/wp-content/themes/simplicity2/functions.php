@@ -7,6 +7,8 @@ require_once('functions/auto-registration/function.php');
 require_once('functions/support-rewards/support-reward-function.php');
 // マイページの報酬確認
 require_once('functions/mypage-reward/function.php');
+// トップページの記事取得
+require_once('functions/fetch-events/function.php');
 
 require_once(ABSPATH . 'wp-admin/includes/file.php');//WP_Filesystemの使用
 include 'lib/php-html-css-js-minifier.php'; //縮小化ライブラリ
@@ -1126,78 +1128,6 @@ endif;
 add_filter('wp_theme_editor_filetypes', 'add_js_to_wp_theme_editor_filetypes');
 
 // -------------------------以下、カスタマイズ-----------------------------------
-
-// トップページにeventのみを表示させる
-function my_search_filter($query) {
-  if (is_home() && $query->is_main_query() ) {
-    // イベントのみ
-    $query->set( 'post_type', 'event' );
-//    $query->set( 'slug', 'premium' );　・・・ダメ
-
-/*
-$query->set('post_type',
-                     array(
-                       'taxonomy' => 'event',
-                 			'slug'    => 'premium',
-    )
-);
-*/
-
-    // 本日日付を取得
-    $currnet_date = date_i18n( 'y/m/d' );
-    //echo $currnet_date;
-   // 1週間後の日付を取得
-   $aweeklater = date( 'y/m/d', strtotime( '+7 days', current_time('timestamp') ) );
-   //echo $aweeklater;
-
-//    $query->set( 'posts_per_page', -1 );
-     $query->set( 'orderby', 'meta_value' );
-     $query->set( 'meta_key', '_eventorganiser_schedule_start_start' );
-     $query->set( 'order', 'ASC' );
-
-     $query->set('meta_query',
-                      array(
-                          array(
-                            'key' => '_eventorganiser_schedule_start_start', //カスタムフィールドを指定
-                            'value' => array($currnet_date, $aweeklater), //本日日付と1週間後を設定
-                            'compare' => 'BETWEEN', //本日日付と1週間後の間
-                            'type' => 'DATE' //フォーマットは日付
-         )
-       )
-    );
-
-/*
-     $query->set('meta_query',
-                      array(
-                          array(
-                            'key' => '_eventorganiser_schedule_start_start', //カスタムフィールドを指定
-                            'value' => $currnet_date, //「ローカルの日付」と比較
-                            'compare' => '>=', //より多いか等しい
-                            'type' => 'DATE' //フォーマットは日付
-         )
-       )
-    );
-    $query->set('meta_query',
-                     array(
-                         array(
-                           'key' => '_eventorganiser_schedule_start_start', //カスタムフィールドを指定
-                           'value' => $aweeklater, //「ローカルの日付」と比較
-                           'compare' => '<', //より多いか等しい
-                           'type' => 'DATE' //フォーマットは日付
-        )
-      )
-   );
-*/
-    // 並び替えに使うカスタムフィールド(イベント開始時間)を指定する
-//    $query->set('meta_key', '_eventorganiser_schedule_start_start');
-    // 指定
-//    $query->set('orderby', 'meta_value_num');
-    // 降順
-//    $query->set('order', 'DESC');
-
-  }
-}
-add_action( 'pre_get_posts', 'my_search_filter' );
 
 // ショートコードでphpファイルを呼び出す
 function my_php_Include($params = array()) {
